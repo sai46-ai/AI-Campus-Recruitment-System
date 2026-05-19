@@ -1,0 +1,77 @@
+# ============================================================================
+# AI Campus Recruitment System - Python Dependencies
+# Compatible with Python 3.14 (pure Python packages preferred)
+# ============================================================================
+# IMPORTANT: This file uses ONLY packages that:
+#   1. Are pure Python (no C/C++ compilation required)
+#   2. Have confirmed Python 3.14 support
+#   3. Have fallbacks if unavailable
+# ============================================================================
+
+# ============================================
+# CORE WEB FRAMEWORK (Required)
+# ============================================
+# FastAPI: Modern async web framework - pure Python
+fastapi>=0.109.0,<1.0.0
+
+# Uvicorn: ASGI server - pure Python core
+# Note: Using WITHOUT [standard] extras to avoid C deps
+uvicorn>=0.27.0,<1.0.0
+
+# Handle multipart form data (file uploads) - pure Python
+python-multipart>=0.0.6,<1.0.0
+
+# Pydantic: Data validation - pure Python (Rust speedups optional)
+pydantic>=2.5.0,<3.0.0
+
+# ============================================
+# PDF PARSING (Pure Python - CRITICAL)
+# ============================================
+# pypdf: Pure Python PDF library (replaces PyMuPDF)
+# No C extensions, works on all Python versions
+pypdf>=3.17.0,<5.0.0
+
+# pdfplumber: Built on pdfminer - pure Python
+# Excellent for extracting text and tables
+pdfplumber>=0.10.0,<1.0.0
+
+# ============================================
+# DOCUMENT PARSING
+# ============================================
+# python-docx: DOCX parsing - pure Python
+python-docx>=1.0.0,<2.0.0
+
+# ============================================
+# TEXT PROCESSING (Pure Python - Always Available)
+# ============================================
+# rapidfuzz: String matching with pure Python fallback
+# Will use C if available, falls back to pure Python
+rapidfuzz>=3.6.0,<4.0.0
+
+# ============================================
+# ENVIRONMENT & UTILITIES
+# ============================================
+# Load .env files - pure Python
+python-dotenv>=1.0.0,<2.0.0
+
+# Typing extensions - pure Python
+typing-extensions>=4.9.0,<5.0.0
+
+# HTTP client for health checks - pure Python
+httpx>=0.26.0,<1.0.0
+
+# ============================================
+# OPTIONAL NLP PACKAGES (May not work on Python 3.14)
+# ============================================
+# These are commented out because they require C extensions
+# The system will detect and use fallback logic if unavailable
+#
+# spacy>=3.7.0,<4.0.0              # Requires C compilation
+# sentence-transformers>=2.3.0     # Requires torch (C extensions)
+# scikit-learn>=1.4.0              # Requires numpy (C extensions)
+# numpy>=1.26.0                    # C extensions
+# torch>=2.0.0                     # C extensions
+#
+# To enable NLP features, install manually if wheels available:
+# pip install spacy sentence-transformers --prefer-binary
+

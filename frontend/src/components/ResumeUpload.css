@@ -1,0 +1,320 @@
+.resume-upload-container {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.resume-upload-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.resume-upload-title svg {
+  color: #a855f7;
+}
+
+/* --- AI ANALYSIS ADDITIONS --- */
+
+.resume-card-wrapper {
+  margin-bottom: 20px;
+}
+
+.ai-results-container {
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.match-score-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #22c55e, #10b981);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
+}
+
+.ai-skills-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.skill-badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-skill-tag {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.ai-skill-tag:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+  border-color: #3b82f6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- END AI ADDITIONS --- */
+
+/* Current Resume Display */
+.current-resume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  /* margin-bottom changed to accommodate wrapper if needed */
+  margin-bottom: 0; 
+}
+
+.resume-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resume-file-info svg {
+  color: #a855f7;
+  flex-shrink: 0;
+}
+
+.resume-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resume-name {
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.resume-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+}
+
+.resume-badge {
+  background: linear-gradient(135deg, #a855f7, #3b82f6);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.delete-btn-icon {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.delete-btn-icon:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+  position: relative;
+  z-index: 1;
+}
+
+.upload-dropzone:hover {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.05);
+}
+
+.upload-dropzone.drag-active {
+  border-color: #a855f7;
+  background: rgba(168, 85, 247, 0.1);
+  transform: scale(1.02);
+}
+
+.upload-dropzone.uploading {
+  pointer-events: none;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.upload-icon {
+  margin-bottom: 16px;
+}
+
+.upload-icon svg {
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s ease;
+}
+
+.upload-dropzone:hover .upload-icon svg,
+.upload-dropzone.drag-active .upload-icon svg {
+  color: #a855f7;
+}
+
+.upload-text {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.upload-hint {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Upload Progress */
+.upload-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(168, 85, 247, 0.2);
+  border-top-color: #a855f7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.upload-progress p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Messages */
+.upload-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-top: 16px;
+  font-size: 0.9rem;
+}
+
+.upload-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.upload-message.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.upload-message svg {
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .resume-upload-container {
+    padding: 16px;
+  }
+
+  .current-resume {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .upload-dropzone {
+    padding: 30px 16px;
+  }
+
+  .upload-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.browse-btn {
+  background: #a855f7;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin: 12px 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
+  display: inline-block;
+}
+
+.browse-btn:hover {
+  background: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+}
+
+.browse-btn:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,140 @@
+/* Card3D.css - Ultra-dynamic 3D card component */
+
+.card-3d {
+  position: relative;
+  border-radius: 20px;
+  background: rgba(2, 11, 24, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(77, 208, 225, 0.2);
+  transition: all 0.1s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(77, 208, 225, 0.1),
+    inset 0 0 20px rgba(77, 208, 225, 0.05);
+}
+
+.card-3d::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(77, 208, 225, 0.05) 0%, 
+    transparent 50%,
+    rgba(124, 77, 255, 0.05) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-3d:hover::before {
+  opacity: 1;
+}
+
+.card-3d:hover {
+  border-color: rgba(77, 208, 225, 0.5);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(77, 208, 225, 0.3),
+    inset 0 0 30px rgba(77, 208, 225, 0.1);
+}
+
+.card-3d-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-color, #4dd0e1), transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  filter: blur(40px);
+  z-index: 2;
+}
+
+.card-3d-content {
+  position: relative;
+  z-index: 3;
+  transform: translateZ(20px);
+}
+
+.card-3d-shine {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.card-3d:hover .card-3d-shine {
+  opacity: 1;
+  animation: shine 1.5s ease-in-out;
+}
+
+/* Intensity variants */
+.card-3d.intensity-low {
+  transition: all 0.15s ease-out;
+}
+
+.card-3d.intensity-medium {
+  transition: all 0.1s ease-out;
+}
+
+.card-3d.intensity-high {
+  transition: all 0.05s ease-out;
+}
+
+/* Animations */
+@keyframes shine {
+  0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+  }
+  100% {
+    transform: translate(100%, 100%) rotate(45deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-3d {
+    transform: none !important;
+  }
+  
+  .card-3d-glow {
+    display: none;
+  }
+}
+
+/* Animation entrance */
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-3d {
+  animation: cardSlideIn 0.5s ease-out;
+}

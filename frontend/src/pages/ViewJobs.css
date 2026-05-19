@@ -1,0 +1,869 @@
+/* ========================================
+   VIEW JOBS PAGE STYLES
+   Modern job listings with AI Match Integration
+   ======================================== */
+
+/* Page Loading */
+.page-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--bg-dark);
+  color: #e0f7fa;
+  font-weight: 500;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Jobs Page Container */
+.jobs-page {
+  min-height: 100vh;
+  position: relative;
+  padding-top: 80px;
+}
+
+/* Page Background */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--bg-dark) 0%, #0a1628 50%, var(--bg-darker) 100%);
+  overflow: hidden;
+}
+
+.page-bg .bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.25;
+  animation: float 12s ease-in-out infinite;
+}
+
+.page-bg .orb-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--primary);
+  top: -150px;
+  left: -150px;
+}
+
+.page-bg .orb-2 {
+  width: 400px;
+  height: 400px;
+  background: var(--secondary);
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -6s;
+}
+
+.page-bg .grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(77, 208, 225, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77, 208, 225, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Page Content */
+.page-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  animation: fadeInUp 0.6s ease-out;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.header-text h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: clamp(1.875rem, 2.5vw, 2.125rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 3px 15px rgba(0, 0, 0, 0.6);
+  letter-spacing: -0.02em;
+}
+
+.header-text h1 svg {
+  color: var(--primary);
+}
+
+.header-text p {
+  font-size: clamp(1.05rem, 1.2vw, 1.15rem);
+  color: #e0f7fa;
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.header-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.header-stats .stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: clamp(2.125rem, 2.8vw, 2.5rem);
+  font-weight: 900;
+  color: var(--primary);
+  text-shadow: 0 3px 15px rgba(77, 208, 225, 0.6);
+}
+
+.stat-label {
+  font-size: clamp(0.925rem, 1.05vw, 1rem);
+  color: #b2ebf2;
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* Search Section */
+.search-section {
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.6s ease-out 0.1s backwards;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.search-bar svg {
+  width: 22px;
+  height: 22px;
+  color: #b2ebf2;
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.search-bar input::placeholder {
+  color: #b2ebf2;
+  opacity: 0.85;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: clamp(0.95rem, 1.05vw, 1rem);
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.filter-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.filter-toggle:hover {
+  background: rgba(77, 208, 225, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Filters Panel */
+.filters-panel {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  animation: fadeInUp 0.3s ease-out;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.filter-group {
+  flex: 1;
+  min-width: 180px;
+}
+
+.filter-group label {
+  display: block;
+  font-size: clamp(0.925rem, 1.05vw, 1rem);
+  font-weight: 600;
+  color: #b2ebf2;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: var(--primary);
+  background: rgba(77, 208, 225, 0.05);
+}
+
+.filter-group select option {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+}
+
+.clear-filters {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: #b2ebf2;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.clear-filters:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* Results Info */
+.results-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: clamp(0.975rem, 1.1vw, 1.05rem);
+  color: #b2ebf2;
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.clear-search {
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.clear-search:hover {
+  text-decoration: underline;
+}
+
+/* Jobs Grid */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Job Card Wrapper for TiltCard */
+.job-card-wrapper {
+  height: 100%;
+}
+
+/* Job Card */
+.job-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out backwards;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.job-card:hover {
+  border-color: rgba(77, 208, 225, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.job-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.company-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.job-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-title-section h3 {
+  font-size: clamp(1.15rem, 1.35vw, 1.25rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.company-name {
+  font-size: clamp(0.95rem, 1.1vw, 1.025rem);
+  color: #e0f7fa;
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* AI MATCH BADGE */
+.ai-match-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1.5px solid;
+  border-radius: var(--radius-lg);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: pulseGlow 2s infinite ease-in-out;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.ai-match-badge svg {
+  animation: rotateIcon 4s linear infinite;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes rotateIcon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- AI MODAL OVERLAY STYLES --- */
+.ai-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.ai-modal-content {
+  background: linear-gradient(145deg, #16243a 0%, #0a1628 100%);
+  border: 1px solid rgba(77, 208, 225, 0.3);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9);
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  color: #fff;
+  margin: 0;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.close-modal:hover { opacity: 1; }
+
+.analysis-score-container {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.score-ring {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 auto 1rem;
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* --- MISSING SKILLS --- */
+.gap-analysis h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ff5252;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.missing-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.skill-tag.missing {
+  padding: 0.4rem 0.9rem;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  color: #ff5252 !important;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.ai-recommendation {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  border-left: 4px solid var(--primary);
+}
+
+.status-badge.open {
+  padding: 0.3rem 0.875rem;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: var(--radius-full);
+  font-size: clamp(0.75rem, 0.85vw, 0.8rem);
+  font-weight: 700;
+  color: var(--success);
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Job Meta */
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: clamp(0.9rem, 1.025vw, 0.975rem);
+  color: #b2ebf2;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.meta-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+.meta-item.salary {
+  color: var(--success);
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 230, 118, 0.4);
+}
+
+/* Job Description */
+.job-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+}
+
+/* Skills Section */
+.job-card .skills-section {
+  margin-bottom: 1.25rem;
+}
+
+.job-card .skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.job-card .skill-tag {
+  padding: 0.375rem 0.8rem;
+  background: rgba(77, 208, 225, 0.15);
+  border: 1px solid rgba(77, 208, 225, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  color: var(--primary);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.job-card .skill-tag:hover {
+  background: var(--primary);
+  color: var(--bg-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(77, 208, 225, 0.4);
+}
+
+.job-card .skill-tag.more {
+  background: rgba(124, 77, 255, 0.1);
+  border-color: rgba(124, 77, 255, 0.2);
+  color: var(--secondary);
+}
+
+/* Job Card Footer */
+.job-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.deadline {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: #b2ebf2;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.deadline svg {
+  width: 14px;
+  height: 14px;
+}
+
+.apply-btn,
+.view-applicants-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--bg-dark);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.apply-btn svg,
+.view-applicants-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.apply-btn:hover:not(:disabled),
+.view-applicants-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(77, 208, 225, 0.3);
+}
+
+.apply-btn:hover:not(:disabled) svg,
+.view-applicants-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.apply-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.applied-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  border-radius: var(--radius-lg);
+  cursor: default;
+  font-family: inherit;
+  box-shadow: inset 0 0 10px rgba(76, 175, 80, 0.1);
+}
+
+.applied-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+}
+
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  color: #b2ebf2;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  font-size: 1.025rem;
+  color: #e0f7fa;
+  margin: 0 0 1.5rem 0;
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.reset-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: rgba(77, 208, 225, 0.1);
+  border: 1px solid rgba(77, 208, 225, 0.3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.reset-btn:hover {
+  background: rgba(77, 208, 225, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 900px) {
+  .page-content {
+    padding: 1.5rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .header-text h1 {
+    justify-content: center;
+  }
+  
+  .jobs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-panel {
+    flex-direction: column;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-content {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+  }
+  
+  .header-text h1 {
+    font-size: 1.4rem;
+  }
+  
+  .header-stats {
+    gap: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .search-bar {
+    flex-wrap: wrap;
+  }
+  
+  .search-bar input {
+    flex: 1 1 100%;
+    order: 1;
+  }
+  
+  .filter-toggle {
+    margin-left: auto;
+  }
+
+  .ai-match-badge {
+    order: 4;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .job-card {
+    padding: 1.25rem;
+  }
+  
+  .job-card-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .deadline {
+    justify-content: center;
+  }
+  
+  .apply-btn,
+  .applied-btn,
+  .view-applicants-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.02);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

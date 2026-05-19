@@ -1,0 +1,192 @@
+/* StatCard3D.css - Ultra-dynamic 3D statistics card */
+
+.stat-card-3d {
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stat-card-wrapper {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  animation: statSlideIn 0.6s ease-out both;
+}
+
+.stat-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, 
+    rgba(77, 208, 225, 0.1), 
+    rgba(124, 77, 255, 0.1)
+  );
+  border-radius: 20px;
+  border: 2px solid var(--icon-color, #4dd0e1);
+  box-shadow: 0 0 30px rgba(77, 208, 225, 0.3);
+  position: relative;
+  z-index: 2;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.stat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.stat-value-container {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, currentColor, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: valueCount 0.8s ease-out;
+}
+
+.stat-trend {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-trend.up {
+  color: #00e676;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.stat-trend.down {
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+
+/* Background animated circles */
+.stat-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.stat-bg-circle.circle-1 {
+  width: 120px;
+  height: 120px;
+  top: -30px;
+  right: -30px;
+  animation: rotateCircle 10s linear infinite;
+}
+
+.stat-bg-circle.circle-2 {
+  width: 80px;
+  height: 80px;
+  bottom: -20px;
+  left: -20px;
+  animation: rotateCircle 8s linear infinite reverse;
+}
+
+/* Animations */
+@keyframes statSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(77, 208, 225, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(77, 208, 225, 0.5);
+  }
+}
+
+@keyframes valueCount {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rotateCircle {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hover effects */
+.stat-card-3d:hover .stat-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 50px rgba(77, 208, 225, 0.6);
+}
+
+.stat-card-3d:hover .stat-value {
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stat-card-wrapper {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+  }
+  
+  .stat-bg-circle {
+    display: none;
+  }
+}

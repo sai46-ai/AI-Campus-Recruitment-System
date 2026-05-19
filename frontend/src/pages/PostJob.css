@@ -1,0 +1,349 @@
+/* ========================================
+   POST JOB PAGE STYLES
+   Modern job posting form with sections
+   ======================================== */
+
+/* Access Denied */
+.access-denied {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  padding: 2rem;
+}
+
+.access-denied h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.access-denied p {
+  color: #e0f7fa;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.access-denied a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* Page Layout */
+.postjob-page {
+  min-height: 100vh;
+  position: relative;
+  padding-top: 80px;
+}
+
+.postjob-page .page-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Page Header - Compact */
+.page-header.compact {
+  text-align: left;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.925rem;
+  color: #b2ebf2;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.back-link svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.back-link:hover {
+  color: var(--primary);
+}
+
+.back-link:hover svg {
+  transform: translateX(-3px);
+}
+
+.page-header.compact h1 {
+  font-size: clamp(1.625rem, 2vw, 1.875rem);
+  margin: 0 0 0.5rem 0;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.01em;
+}
+
+.page-header.compact p {
+  font-size: clamp(1rem, 1.15vw, 1.08rem);
+  color: #b2ebf2;
+  margin: 0;
+  font-weight: 500;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Success/Error Messages */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: var(--radius-lg);
+  color: var(--success);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.4s ease;
+}
+
+.success-message svg,
+.error-message svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* Job Form */
+.job-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Form Section */
+.form-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  animation: fadeInUp 0.6s ease-out backwards;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.form-section:nth-child(2) { animation-delay: 0.1s; }
+.form-section:nth-child(3) { animation-delay: 0.2s; }
+.form-section:nth-child(4) { animation-delay: 0.3s; }
+.form-section:nth-child(5) { animation-delay: 0.4s; }
+
+.form-section h3 {
+  font-size: clamp(1.2rem, 1.4vw, 1.3rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.875rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #b2ebf2;
+  opacity: 0.85;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary);
+  background: rgba(77, 208, 225, 0.05);
+  box-shadow: 0 0 0 3px rgba(77, 208, 225, 0.1);
+}
+
+.form-group select option {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+}
+
+.input-hint {
+  font-size: 0.85rem;
+  color: #b2ebf2;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Skills Preview */
+.skills-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.preview-label {
+  font-size: 0.9rem;
+  color: #b2ebf2;
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.skills-preview .skill-tag {
+  padding: 0.4rem 0.85rem;
+  background: rgba(77, 208, 225, 0.15);
+  border: 1px solid rgba(77, 208, 225, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  color: var(--primary);
+  animation: fadeIn 0.3s ease;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
+
+.cancel-btn {
+  padding: 0.875rem 1.75rem;
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: #b2ebf2;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: inherit;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.cancel-btn:hover {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.job-form .submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bg-dark);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.job-form .submit-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.job-form .submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(77, 208, 225, 0.3);
+}
+
+.job-form .submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .postjob-page .page-content {
+    padding: 1.5rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-section {
+    padding: 1.25rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .cancel-btn,
+  .job-form .submit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .postjob-page .page-content {
+    padding: 1rem;
+  }
+  
+  .page-header.compact {
+    padding: 1rem 1.25rem;
+  }
+  
+  .page-header.compact h1 {
+    font-size: 1.25rem;
+  }
+}

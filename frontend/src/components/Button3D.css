@@ -1,0 +1,264 @@
+/**
+ * Button3D.css
+ * Styles for 3D button component with depth, shadows, and animations
+ */
+
+/* Base button structure */
+.btn-3d {
+  --btn-bg: linear-gradient(135deg, #4dd0e1, #26c6da);
+  --btn-edge: #1a8a96;
+  --btn-shadow: rgba(0, 0, 0, 0.4);
+  --btn-text: #022b3a;
+  --btn-glow: rgba(77, 208, 225, 0.5);
+  --btn-depth: 6px;
+  
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  perspective: 500px;
+  transition: filter 0.2s ease;
+  outline: none;
+}
+
+.btn-3d:focus-visible {
+  outline: 2px solid var(--btn-glow);
+  outline-offset: 4px;
+  border-radius: var(--radius-md, 12px);
+}
+
+/* 3D Shadow layer (bottom) */
+.btn-3d__shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md, 12px);
+  background: var(--btn-shadow);
+  transform: translateY(var(--btn-depth)) translateZ(-10px);
+  filter: blur(8px);
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+/* 3D Edge layer (middle - creates depth) */
+.btn-3d__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md, 12px);
+  background: var(--btn-edge);
+  transform: translateY(calc(var(--btn-depth) / 2));
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Front face (top layer) */
+.btn-3d__front {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem 2rem;
+  background: var(--btn-bg);
+  border-radius: var(--radius-md, 12px);
+  color: var(--btn-text);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-weight: 700;
+  transform: translateY(0);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Glow effect */
+.btn-3d__glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-md, 12px);
+  background: var(--btn-glow);
+  filter: blur(15px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+/* Hover state */
+.btn-3d:hover:not(.btn-3d--disabled):not(.btn-3d--loading) .btn-3d__glow {
+  opacity: 0.6;
+}
+
+.btn-3d:hover:not(.btn-3d--disabled):not(.btn-3d--loading) .btn-3d__front {
+  transform: translateY(-2px);
+}
+
+.btn-3d:hover:not(.btn-3d--disabled):not(.btn-3d--loading) .btn-3d__edge {
+  transform: translateY(calc(var(--btn-depth) / 2 + 2px));
+}
+
+.btn-3d:hover:not(.btn-3d--disabled):not(.btn-3d--loading) .btn-3d__shadow {
+  transform: translateY(calc(var(--btn-depth) + 4px)) translateZ(-10px);
+  opacity: 0.35;
+}
+
+/* Pressed state */
+.btn-3d--pressed .btn-3d__front,
+.btn-3d:active:not(.btn-3d--disabled) .btn-3d__front {
+  transform: translateY(calc(var(--btn-depth) - 2px));
+}
+
+.btn-3d--pressed .btn-3d__edge,
+.btn-3d:active:not(.btn-3d--disabled) .btn-3d__edge {
+  transform: translateY(calc(var(--btn-depth) - 1px));
+}
+
+.btn-3d--pressed .btn-3d__shadow,
+.btn-3d:active:not(.btn-3d--disabled) .btn-3d__shadow {
+  transform: translateY(2px) translateZ(-10px);
+  filter: blur(4px);
+  opacity: 0.6;
+}
+
+/* Ripple effect */
+.btn-3d__ripple {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: btn-ripple 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes btn-ripple {
+  to {
+    transform: translate(-50%, -50%) scale(30);
+    opacity: 0;
+  }
+}
+
+/* Icon styling */
+.btn-3d__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.btn-3d__icon svg {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+.btn-3d:hover .btn-3d__icon--right {
+  transform: translateX(4px);
+}
+
+.btn-3d:hover .btn-3d__icon--left {
+  transform: translateX(-4px);
+}
+
+/* Loading spinner */
+.btn-3d__spinner {
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Size variants */
+.btn-3d--small .btn-3d__front {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.btn-3d--small {
+  --btn-depth: 4px;
+}
+
+.btn-3d--large .btn-3d__front {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.125rem;
+}
+
+.btn-3d--large {
+  --btn-depth: 8px;
+}
+
+/* Color variants */
+.btn-3d--secondary {
+  --btn-bg: linear-gradient(135deg, #7c4dff, #651fff);
+  --btn-edge: #4a148c;
+  --btn-glow: rgba(124, 77, 255, 0.5);
+  --btn-text: #ffffff;
+}
+
+.btn-3d--ghost {
+  --btn-bg: rgba(255, 255, 255, 0.08);
+  --btn-edge: rgba(255, 255, 255, 0.05);
+  --btn-shadow: rgba(0, 0, 0, 0.2);
+  --btn-text: #ffffff;
+  --btn-glow: rgba(255, 255, 255, 0.1);
+  --btn-depth: 4px;
+}
+
+.btn-3d--ghost .btn-3d__front {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-3d--ghost:hover .btn-3d__front {
+  border-color: rgba(77, 208, 225, 0.5);
+  background: rgba(77, 208, 225, 0.1);
+}
+
+.btn-3d--danger {
+  --btn-bg: linear-gradient(135deg, #ff5252, #d32f2f);
+  --btn-edge: #b71c1c;
+  --btn-glow: rgba(255, 82, 82, 0.5);
+  --btn-text: #ffffff;
+}
+
+/* Disabled state */
+.btn-3d--disabled {
+  --btn-bg: rgba(255, 255, 255, 0.1);
+  --btn-edge: rgba(255, 255, 255, 0.05);
+  --btn-text: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.btn-3d--disabled .btn-3d__glow {
+  display: none;
+}
+
+/* Loading state */
+.btn-3d--loading {
+  cursor: wait;
+}
+
+.btn-3d--loading .btn-3d__text {
+  opacity: 0.7;
+}
+
+/* Full width */
+.btn-3d--full-width {
+  width: 100%;
+}
+
+.btn-3d--full-width .btn-3d__front {
+  width: 100%;
+}

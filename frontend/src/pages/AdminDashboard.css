@@ -1,0 +1,92 @@
+.admin-page {
+  min-height: 100vh;
+  position: relative;
+}
+
+.admin-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.admin-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 110px 24px 40px;
+}
+
+.admin-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(2, 11, 24, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 10;
+}
+
+.admin-header h1 {
+  margin: 0;
+  color: #fff;
+}
+
+.admin-header p {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.admin-card {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.jobs-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.job-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.job-title {
+  color: #fff;
+  font-weight: 700;
+}
+
+.job-status {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+}

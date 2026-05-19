@@ -1,0 +1,455 @@
+/* ═══════════════════════════════════════════════════════════════
+   AI CAMPUS RECRUITMENT SYSTEM - APP STYLES v3.0
+   Main Application Container Styles with 3D Utilities
+═══════════════════════════════════════════════════════════════ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3D SCENE CONTAINER STYLES
+═══════════════════════════════════════════════════════════════ */
+.scene-3d-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.scene-3d-container canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* App content layer - above 3D scene */
+.app-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding-top: 90px; /* Space for fixed navbar */
+  animation: contentFadeIn 0.6s ease-out;
+  transform-style: preserve-3d;
+  perspective: 2000px;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE TRANSITIONS WITH 3D EFFECTS
+═══════════════════════════════════════════════════════════════ */
+
+/* Page transition animations */
+.page-enter {
+  opacity: 0;
+  transform: translateY(30px) rotateX(10deg);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Global loading spinner */
+.global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.global-loader .spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(77, 208, 225, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  padding: 1.125rem 1.75rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  min-width: 300px;
+  animation: slideIn 0.3s ease;
+  font-weight: 600;
+  font-size: clamp(0.975rem, 1.1vw, 1.05rem);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.toast.success {
+  border-color: var(--accent-success);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
+}
+
+.toast.error {
+  border-color: var(--accent-error);
+  box-shadow: 0 0 20px rgba(255, 82, 82, 0.2);
+}
+
+.toast.info {
+  border-color: var(--accent-info);
+  box-shadow: 0 0 20px rgba(64, 196, 255, 0.2);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Utility classes */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3D UTILITY CLASSES
+═══════════════════════════════════════════════════════════════ */
+
+/* 3D Transform Preserve */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-sm {
+  perspective: 500px;
+}
+
+.perspective-md {
+  perspective: 1000px;
+}
+
+.perspective-lg {
+  perspective: 2000px;
+}
+
+/* 3D Depth Layers */
+.translate-z-0 { transform: translateZ(0px); }
+.translate-z-1 { transform: translateZ(10px); }
+.translate-z-2 { transform: translateZ(20px); }
+.translate-z-3 { transform: translateZ(30px); }
+.translate-z-4 { transform: translateZ(40px); }
+.translate-z-5 { transform: translateZ(50px); }
+
+.-translate-z-1 { transform: translateZ(-10px); }
+.-translate-z-2 { transform: translateZ(-20px); }
+.-translate-z-3 { transform: translateZ(-30px); }
+
+/* 3D Rotation Utilities */
+.rotate-x-1 { transform: rotateX(5deg); }
+.rotate-x-2 { transform: rotateX(10deg); }
+.rotate-x-3 { transform: rotateX(15deg); }
+.-rotate-x-1 { transform: rotateX(-5deg); }
+.-rotate-x-2 { transform: rotateX(-10deg); }
+.-rotate-x-3 { transform: rotateX(-15deg); }
+
+.rotate-y-1 { transform: rotateY(5deg); }
+.rotate-y-2 { transform: rotateY(10deg); }
+.rotate-y-3 { transform: rotateY(15deg); }
+.-rotate-y-1 { transform: rotateY(-5deg); }
+.-rotate-y-2 { transform: rotateY(-10deg); }
+.-rotate-y-3 { transform: rotateY(-15deg); }
+
+/* 3D Card Hover Effects */
+.hover-3d {
+  transition: transform 0.4s var(--ease-spring);
+  transform-style: preserve-3d;
+}
+
+.hover-3d:hover {
+  transform: translateY(-8px) translateZ(20px) rotateX(5deg);
+}
+
+.hover-lift {
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-12px);
+  box-shadow: var(--shadow-xl), var(--shadow-glow);
+}
+
+.hover-tilt {
+  transition: transform 0.3s var(--ease-spring);
+  transform-style: preserve-3d;
+}
+
+.hover-tilt:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(10px);
+}
+
+/* Floating Animation Utilities */
+.float-sm {
+  animation: floatSm 4s ease-in-out infinite;
+}
+
+.float-md {
+  animation: floatMd 5s ease-in-out infinite;
+}
+
+.float-lg {
+  animation: floatLg 6s ease-in-out infinite;
+}
+
+@keyframes floatSm {
+  0%, 100% { transform: translateY(0) translateZ(0); }
+  50% { transform: translateY(-10px) translateZ(5px); }
+}
+
+@keyframes floatMd {
+  0%, 100% { transform: translateY(0) translateZ(0) rotateX(0); }
+  50% { transform: translateY(-15px) translateZ(10px) rotateX(2deg); }
+}
+
+@keyframes floatLg {
+  0%, 100% { transform: translateY(0) translateZ(0) rotate(0deg); }
+  25% { transform: translateY(-10px) translateZ(5px) rotate(1deg); }
+  50% { transform: translateY(-20px) translateZ(15px) rotate(0deg); }
+  75% { transform: translateY(-10px) translateZ(5px) rotate(-1deg); }
+}
+
+/* Orbit Animation */
+.orbit {
+  animation: orbit 20s linear infinite;
+}
+
+.orbit-reverse {
+  animation: orbitReverse 20s linear infinite;
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+}
+
+@keyframes orbitReverse {
+  from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+  to { transform: rotate(-360deg) translateX(100px) rotate(360deg); }
+}
+
+/* Glow Animation Utilities */
+.glow-primary {
+  animation: glowPrimary 3s ease-in-out infinite;
+}
+
+.glow-secondary {
+  animation: glowSecondary 3s ease-in-out infinite;
+}
+
+@keyframes glowPrimary {
+  0%, 100% { box-shadow: 0 0 20px rgba(77, 208, 225, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(77, 208, 225, 0.6), 0 0 80px rgba(77, 208, 225, 0.3); }
+}
+
+@keyframes glowSecondary {
+  0%, 100% { box-shadow: 0 0 20px rgba(124, 77, 255, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(124, 77, 255, 0.6), 0 0 80px rgba(124, 77, 255, 0.3); }
+}
+
+/* Particle Effect Container */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Morphing Blob Animation */
+.blob {
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  animation: morphBlob 8s ease-in-out infinite;
+}
+
+@keyframes morphBlob {
+  0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  25% { border-radius: 70% 30% 50% 50% / 30% 40% 70% 60%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  75% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+/* Scroll-triggered animations base */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.8s ease, transform 0.8s var(--ease-spring);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s ease, transform 0.8s var(--ease-spring);
+}
+
+.scroll-reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s ease, transform 0.8s var(--ease-spring);
+}
+
+.scroll-reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.8s ease, transform 0.8s var(--ease-spring);
+}
+
+.scroll-reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE 3D ADJUSTMENTS
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Reduce 3D effects intensity on mobile */
+  .hover-3d:hover {
+    transform: translateY(-4px);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-6px);
+  }
+  
+  .hover-tilt:hover {
+    transform: none;
+  }
+  
+  /* Disable some animations on mobile for performance */
+  .orbit,
+  .orbit-reverse {
+    animation: none;
+  }
+  
+  /* Reduce floating animation intensity */
+  .float-lg {
+    animation: floatSm 4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-sm,
+  .float-md,
+  .float-lg,
+  .orbit,
+  .orbit-reverse,
+  .glow-primary,
+  .glow-secondary,
+  .blob {
+    animation: none;
+  }
+  
+  .scroll-reveal,
+  .scroll-reveal-left,
+  .scroll-reveal-right,
+  .scroll-reveal-scale {
+    opacity: 1;
+    transform: none;
+  }
+}

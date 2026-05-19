@@ -1,0 +1,37 @@
+{
+  "name": "ai-campus-recruitment-backend",
+  "version": "1.0.0",
+  "description": "Backend API for AI Campus Recruitment System",
+  "main": "server.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server.js",
+    "dev": "cross-env NODE_ENV=development node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "recruitment",
+    "campus",
+    "ai",
+    "jobs"
+  ],
+  "author": "VVIT",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.5",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "escape-string-regexp": "^5.0.0",
+    "express": "^5.2.1",
+    "form-data": "^4.0.5",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}

@@ -1,0 +1,46 @@
+/**
+ * TiltCard.css
+ * Styles for 3D tilt card component with depth and glare effects
+ */
+
+.tilt-card {
+  position: relative;
+  will-change: transform;
+  transform-style: preserve-3d;
+  border-radius: var(--radius-xl, 20px);
+  overflow: hidden;
+}
+
+.tilt-card-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+/* Inner content should have 3D depth */
+.tilt-card > *:not(.tilt-card-glare) {
+  transform: translateZ(20px);
+}
+
+/* Deep shadow for 3D effect */
+.tilt-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 
+    0 30px 60px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.tilt-card:hover::before {
+  box-shadow: 
+    0 40px 70px -15px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(77, 208, 225, 0.3),
+    0 0 40px rgba(77, 208, 225, 0.2);
+}
