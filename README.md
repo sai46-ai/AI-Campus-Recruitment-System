@@ -178,15 +178,4 @@ Include authors, contributors and supervisor names in your citation entry as app
 
 ## License
 
-This project is released under the ISC License. See `LICENSE` for details.
-
-## Contact
-
-Project lead / maintainer: add an email or contact method here for academic inquiries.
-
----
-
-If you'd like, I can also:
-- add a short `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`
-- generate a minimal `LICENSE` file in the repo
-- run a quick smoke test sequence after you start services
+This project is released under the ISC License.
