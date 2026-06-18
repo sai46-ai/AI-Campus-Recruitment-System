@@ -32,10 +32,6 @@ This project automates candidate screening by combining deterministic heuristics
 
 Use cases: campus hiring drives, academic research on resume analysis, and recruiter tooling for small to medium enterprises.
 
-## Motivation
-
-Recruitment at scale is time-consuming and subjective. This system provides reproducible, explainable candidate rankings to reduce bias and speed up shortlisting.
-
 ## Key features
 - Resume parsing: PDF and DOCX support
 - Skill extraction: curated taxonomy + semantic matching
