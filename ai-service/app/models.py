@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 class SkillMatchRequest(BaseModel):
     """Request for skill matching analysis."""
     resume_text: str = Field(..., min_length=10, description="Extracted resume text")
-    job_description: str = Field(..., min_length=10, description="Job description text")
+    job_description: Optional[str] = Field(default="", description="Job description text")
     required_skills: List[str] = Field(..., min_items=1, description="List of required skills")
     student_skills: Optional[List[str]] = Field(default=[], description="Pre-extracted student skills")
 
@@ -73,14 +73,14 @@ class ScoreBreakdown(BaseModel):
     Weights updated for Student-Pro logic (75% Skills).
     """
     skill_coverage_score: float = Field(ge=0, le=100)
-    skill_coverage_weight: float = 0.75  # INCREASED: Focus on technical ability
+    skill_coverage_weight: float = 0.75  # Focus on technical ability
     experience_score: float = Field(ge=0, le=100)
-    experience_weight: float = 0.10      # REDUCED: Fair for student profiles
+    experience_weight: float = 0.10      # Fair for student profiles
     education_score: float = Field(ge=0, le=100)
     education_weight: float = 0.10       # Standardized
     resume_quality_score: float = Field(ge=0, le=100)
-    resume_quality_weight: float = 0.05  # MINIMIZED: Less impact from layout
-    
+    resume_quality_weight: float = 0.05  # Less impact from layout
+
     @property
     def weighted_total(self) -> float:
         """Calculates final score based on Student-Pro weights."""
@@ -97,30 +97,46 @@ class AIAnalysisResult(BaseModel):
     # Overall score
     final_score: float = Field(ge=0, le=100)
     score_breakdown: ScoreBreakdown
-    
+
     # Skills analysis
     extracted_skills: List[ExtractedSkill]
     skill_matches: List[SkillMatchResult]
     matched_skills_count: int
     total_required_skills: int
     skill_coverage_percent: float
-    
+
     # Missing skills for improvement feedback
     missing_skills: List[str]
-    
+
     # Resume sections
     detected_sections: List[ResumeSection]
     missing_sections: List[str]
-    
+
     # Parsed entities
     experience: List[ExperienceEntry]
     education: List[EducationEntry]
     certifications: List[str]
-    
-    # AI-generated feedback
+
+    # Parsed contact info
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    github: Optional[str] = None
+    linkedin: Optional[str] = None
+    portfolio: Optional[str] = None
+    links: List[str] = []
+    projects: List[str] = []
+
+    # AI-generated feedback & suggestions
     recommendations: List[str]
     summary: str
-    
+
+    # Career & skill improvement features
+    career_suggestions: List[str] = []
+    learning_roadmap: List[str] = []
+    personality_insights: List[str] = []
+    resume_improvements: List[str] = []
+
     # Metadata
     resume_word_count: int
     analysis_model: str = "skill-match-student-pro-v1"
@@ -129,7 +145,7 @@ class AIAnalysisResult(BaseModel):
 class ResumeParseResponse(BaseModel):
     """Standard response for resume parsing."""
     success: bool
-    message: str
+    message: str = "Completed"
     data: Optional[AIAnalysisResult] = None
     error: Optional[str] = None
 

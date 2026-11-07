@@ -9,7 +9,7 @@ Integrated with:
 import os
 import sys
 import logging
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 # Configure logging FIRST
 logging.basicConfig(
@@ -18,7 +18,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Log Python version immediately for debugging
 logger.info(f"[STARTUP] Python version: {sys.version}")
 logger.info(f"[STARTUP] Python executable: {sys.executable}")
 
@@ -26,7 +25,7 @@ logger.info(f"[STARTUP] Python executable: {sys.executable}")
 # Safe FastAPI Import (CRITICAL)
 # ============================================================================
 try:
-    from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+    from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Body
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import JSONResponse
     logger.info("[STARTUP] FastAPI loaded successfully")
@@ -129,11 +128,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    # Updated to ensure React development environments work
-    allow_origins=settings.ALLOWED_ORIGINS + ["http://localhost:5173"],
+    allow_origins=list(set(settings.ALLOWED_ORIGINS + ["http://localhost:5173"])),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
 models_loaded = MODULE_STATUS["analyzer"] and MODULE_STATUS["parser"]
@@ -163,37 +161,46 @@ async def health_check():
         "pdf_engine": PDF_INFO,
         "nlp_engine": NLP_INFO,
         "matcher_engine": MATCHER_INFO,
-        "modules": MODULE_STATUS
+        "modules": MODULE_STATUS,
     }
 
 @app.get("/", tags=["System"])
 async def root():
-    return {"service": "AI Resume Analysis Service", "version": "1.0.0"}
+    return {"service": "AI Resume Analysis Service", "version": "2.1.0"}
 
 @app.post("/analyze/file", response_model=ResumeParseResponse, tags=["Analysis"])
 async def analyze_file(
     file: UploadFile = File(...),
-    required_skills: str = Form(...),
-    job_description: Optional[str] = Form(None)
+    required_skills: str = Form(""),
+    job_description: Optional[str] = Form(None),
 ):
-    ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in {".pdf", ".docx"}:
-        raise HTTPException(status_code=400, detail="Only PDF and DOCX allowed")
-    
+    filename = file.filename or "resume.pdf"
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in {".pdf", ".docx", ".doc"}:
+        raise HTTPException(status_code=400, detail="Only PDF, DOCX, and DOC files are allowed")
+
     file_bytes = await file.read()
     skills_list = [s.strip() for s in required_skills.split(",") if s.strip()]
-    
+
     result = analyze_resume(
         file_bytes=file_bytes,
-        filename=file.filename,
+        filename=filename,
         required_skills=skills_list,
-        job_description=job_description
+        job_description=job_description,
     )
-    
+
+    if not result.get("success", False):
+        return ResumeParseResponse(
+            success=False,
+            message=result.get("message", "Analysis failed"),
+            error=result.get("error"),
+            data=None,
+        )
+
     return ResumeParseResponse(
-        success=result.get("success", False),
+        success=True,
         message=result.get("message", "Completed"),
-        data=result.get("data")
+        data=result.get("data"),
     )
 
 @app.post("/analyze/text", response_model=ResumeParseResponse, tags=["Analysis"])
@@ -201,51 +208,104 @@ async def analyze_text(request: SkillMatchRequest):
     result = analyze_text_only(
         resume_text=request.resume_text,
         required_skills=request.required_skills,
-        student_skills=request.student_skills
+        student_skills=request.student_skills,
     )
-    return ResumeParseResponse(success=True, data=result.get("data"))
+    if not result.get("success", False):
+        return ResumeParseResponse(
+            success=False,
+            message=result.get("message", "Text analysis failed"),
+            error=result.get("error"),
+            data=None,
+        )
+    return ResumeParseResponse(
+        success=True,
+        message=result.get("message", "Completed"),
+        data=result.get("data"),
+    )
 
-# --- OPTIMIZED JOB-SPECIFIC MATCHING ENDPOINT ---
 @app.post("/analyze/match", tags=["Analysis"])
-async def analyze_job_match(request: dict):
+async def analyze_job_match(request: Dict[str, Any] = Body(...)):
     """
     Compares a student's extracted skills against a job's specific requirements.
-    Updated to match new skill_matcher.py key names.
     """
+    student_skills = request.get("student_skills", [])
+    job_requirements = request.get("job_requirements", [])
+
+    if not job_requirements:
+        raise HTTPException(status_code=400, detail="Job requirements are empty")
+
     try:
-        student_skills = request.get("student_skills", [])
-        job_requirements = request.get("job_requirements", [])
-
-        if not job_requirements:
-            raise HTTPException(status_code=400, detail="Job requirements are empty")
-
         from app.skill_matcher import match_skills, calculate_skill_coverage, get_missing_skills
-        
-        # Execute matching logic
+
         match_results = match_skills(student_skills, job_requirements)
         matched_count, total_required, coverage = calculate_skill_coverage(match_results)
         missing = get_missing_skills(match_results)
-        
+
         return {
             "success": True,
             "match_score": round(coverage, 2),
             "data": {
-                # FIX: Corrected key to 'matched' to align with skill_matcher.py
-                "matched_skills": [m['required_skill'] for m in match_results if m['matched']],
+                "matched_skills": [m["required_skill"] for m in match_results if m["matched"]],
                 "missing_skills": missing,
-                "total_required": total_required
-            }
+                "matched_count": matched_count,
+                "total_required": total_required,
+            },
         }
     except Exception as e:
         logger.error(f"Job matching failed: {e}")
-        return {"success": False, "match_score": 0, "error": str(e)}
+        raise HTTPException(status_code=500, detail=f"Job matching failed: {str(e)}")
+
+@app.post("/analyze/match/batch", tags=["Analysis"])
+async def analyze_job_match_batch(request: Dict[str, Any] = Body(...)):
+    """
+    Compares a student's extracted skills against multiple jobs' requirements in one batch request.
+    """
+    try:
+        student_skills = request.get("student_skills", [])
+        jobs = request.get("jobs", [])
+
+        if not jobs:
+            return {"success": True, "scores": {}}
+
+        from app.skill_matcher import match_skills, calculate_skill_coverage
+
+        scores = {}
+        for job in jobs:
+            job_id = job.get("id")
+            job_requirements = job.get("required_skills", [])
+
+            if not job_requirements:
+                scores[job_id] = 0.0
+                continue
+
+            match_results = match_skills(student_skills, job_requirements)
+            _, _, coverage = calculate_skill_coverage(match_results)
+            scores[job_id] = round(coverage, 2)
+
+        return {
+            "success": True,
+            "scores": scores,
+        }
+    except Exception as e:
+        logger.error(f"Batch job matching failed: {e}")
+        return {"success": False, "scores": {}, "error": str(e)}
 
 @app.post("/analyze/skills", tags=["Analysis"])
-async def analyze_skills_only(student_skills: List[str], required_skills: List[str]):
-    from app.skill_matcher import match_skills, calculate_skill_coverage
+async def analyze_skills_only(
+    student_skills: List[str] = Body(default=[]),
+    required_skills: List[str] = Body(default=[]),
+):
+    from app.skill_matcher import match_skills, calculate_skill_coverage, get_missing_skills
     match_results = match_skills(student_skills, required_skills)
-    _, _, coverage = calculate_skill_coverage(match_results)
-    return {"success": True, "final_score": round(coverage, 2)}
+    matched_count, total_req, coverage = calculate_skill_coverage(match_results)
+    missing = get_missing_skills(match_results)
+    return {
+        "success": True,
+        "final_score": round(coverage, 2),
+        "matched_count": matched_count,
+        "total_required": total_req,
+        "missing_skills": missing,
+    }
 
 # ============================================================================
 # Main Entry Point
@@ -253,5 +313,4 @@ async def analyze_skills_only(student_skills: List[str], required_skills: List[s
 
 if __name__ == "__main__":
     import uvicorn
-    # Use config-based settings for host and port
     uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG)
