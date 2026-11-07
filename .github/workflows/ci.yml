@@ -1,0 +1,171 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, production-hardening]
+  pull_request:
+    branches: [main, production-hardening]
+
+jobs:
+  backend:
+    name: Backend Tests & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports: [27017:27017]
+        options: --health-cmd="mongosh --eval 'db.adminCommand(\"ping\")'" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7.0-alpine
+        ports: [6379:6379]
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    env:
+      NODE_ENV: test
+      PORT: 5000
+      API_PREFIX: /api/v1
+      MONGODB_URI: mongodb://localhost:27017/ai_campus_recruitment
+      REDIS_URL: redis://localhost:6379
+      CLIENT_URL: http://localhost:5173
+      JWT_SECRET: ci_test_secret_key_32_chars_minimum_length_here
+      JWT_REFRESH_SECRET: ci_test_refresh_secret_32_chars_minimum_here
+      JWT_EXPIRES_IN: 1d
+      JWT_REFRESH_EXPIRES_IN: 7d
+      GEMINI_API_KEY: dummy_key_for_fallback
+      GOOGLE_CLIENT_ID: ci_test_client_id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npx tsc
+
+      - name: Run unit & integration tests
+        run: npm test -- --coverage=false --maxWorkers=2
+
+  frontend:
+    name: Frontend Tests & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    env:
+      VITE_API_URL: http://localhost:5000/api/v1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Run tests (if any)
+        run: npm test --if-present -- --watchAll=false
+
+  security-regression:
+    name: Security Regression Tests
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ./backend
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports: [27017:27017]
+        options: --health-cmd="mongosh --eval 'db.adminCommand(\"ping\")'" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7.0-alpine
+        ports: [6379:6379]
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    env:
+      NODE_ENV: test
+      PORT: 5000
+      API_PREFIX: /api/v1
+      MONGODB_URI: mongodb://localhost:27017/ai_campus_recruitment
+      REDIS_URL: redis://localhost:6379
+      CLIENT_URL: http://localhost:5173
+      JWT_SECRET: ci_test_secret_key_32_chars_minimum_length_here
+      JWT_REFRESH_SECRET: ci_test_refresh_secret_32_chars_minimum_here
+      JWT_EXPIRES_IN: 1d
+      JWT_REFRESH_EXPIRES_IN: 7d
+      GEMINI_API_KEY: dummy_key_for_fallback
+      GOOGLE_CLIENT_ID: ci_test_client_id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security regression tests
+        run: npm test -- --testPathPattern=security.regression --maxWorkers=2
+
+  docker-build:
+    name: Docker Multi-stage Build
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t ai-campus-recruitment/backend:${{ github.sha }} ./backend
+
+      - name: Build frontend image
+        run: docker build -t ai-campus-recruitment/frontend:${{ github.sha }} ./frontend
+
+      - name: Build ai-service image
+        run: docker build -t ai-campus-recruitment/ai-service:${{ github.sha }} ./ai-service
+
+      - name: Test docker-compose up (smoke test)
+        run: |
+          docker compose up -d --build
+          sleep 10
+          curl -f http://localhost:5000/api/v1/health || exit 1
+          curl -f http://localhost:5173/ || exit 1
+          docker compose down

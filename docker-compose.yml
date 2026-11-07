@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: campus_recruitment_mongodb
+    restart: always
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ai_campus_recruitment
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: campus_recruitment_redis
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campus_recruitment_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 5000
+      API_PREFIX: /api/v1
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/ai_campus_recruitment}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+      UPLOAD_DIR: /app/uploads
+      JWT_SECRET: ${JWT_SECRET:-production_secure_jwt_access_secret_min_32_characters_2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-production_secure_jwt_refresh_secret_min_32_characters_2026}
+      CSRF_SECRET: ${CSRF_SECRET:-production_secure_csrf_secret_min_32_characters_2026}
+      ALLOW_PRODUCTION_SEED: ${ALLOW_PRODUCTION_SEED:-true}
+      ALLOW_DEV_OTP: ${ALLOW_DEV_OTP:-true}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      - mongodb
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: campus_recruitment_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: campus_recruitment_ai
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      HOST: 0.0.0.0
+      ENV: production
+      DEBUG: "false"
+
+volumes:
+  mongodb_data:
+  backend_uploads:
