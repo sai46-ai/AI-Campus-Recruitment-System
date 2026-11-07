@@ -1,177 +1,283 @@
-# AI Campus Recruitment System
+# AI Campus Recruitment & Placement Management System
+## Full-Stack University Career Portal with Procedural 3D WebGL Environments & Dual-Mode AI
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
-[![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://reactjs.org/)
+[![CI Pipeline](https://github.com/sai46-ai/AI-Campus-Recruitment-System/actions/workflows/ci.yml/badge.svg)](https://github.com/sai46-ai/AI-Campus-Recruitment-System/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-61dafb.svg)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-brightgreen.svg)](https://www.mongodb.com/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688.svg)](https://fastapi.tiangolo.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248.svg)](https://www.mongodb.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A research-grade, AI-driven campus recruitment platform providing automated resume parsing, semantic skill extraction, and transparent candidate scoring. This repository contains three coordinated services: a React frontend, an Express backend, and a Python AI microservice.
+---
 
-## Table of contents
-- Overview
-- Motivation
-- Key features
-- Architecture
-- Project structure
-- Setup & Installation
-- Development & Running
-- Configuration (env)
-- Testing
-- Deployment
-- Contribution & License
-- Academic information & Citation
+## 1. PROJECT TITLE & PURPOSE
 
-## Overview
+The **AI Campus Recruitment System** is an enterprise-grade, full-stack recruitment and placement management platform engineered for universities, corporate recruitment teams, and university students.
 
-This project automates candidate screening by combining deterministic heuristics with modern NLP:
-- Document parsing (PDF/DOCX)
-- Named-entity & skill extraction (spaCy + custom taxonomy)
-- Semantic matching (sentence-transformers)
-- Transparent scoring (skills, experience, education, resume quality)
+The platform streamlines the end-to-end institutional hiring lifecycle: from posting verified placement drives and academic eligibility gating, to AI-assisted ATS resume parsing, candidate scoring, applicant pipeline tracking, and institutional NIRF/NAAC placement analytics. The user experience combines an accessible, collegiate multi-color design system with five interactive procedural 3D WebGL environments that visualize institutional data topology without interfering with usability or content legibility.
 
-Use cases: campus hiring drives, academic research on resume analysis, and recruiter tooling for small to medium enterprises.
+---
 
-## Key features
-- Resume parsing: PDF and DOCX support
-- Skill extraction: curated taxonomy + semantic matching
-- Candidate scoring: deterministic, auditable formula
-- Role-based app: student, recruiter, admin
-- File validation and secure uploads
-- Extensible AI microservice for research experiments
+## 2. MAIN USER ROLES
 
-## Architecture
+The application enforces server-side Role-Based Access Control (RBAC) across four distinct institutional personas:
 
-Three services communicate over HTTP; MongoDB stores application data.
+1. **Student Candidate (`student`):**
+   - Discovers active placement drives filtered by employment type, work model, and eligibility cutoffs.
+   - Builds resumes using the interactive Resume Studio or uploads existing documents (PDF/DOCX).
+   - Receives multidimensional ATS compatibility scores and personalized skill gap analyses.
+   - Applies for opportunities and tracks real-time progress through recruitment pipelines.
+2. **Corporate Recruiter (`recruiter`):**
+   - Posts campus placement drives with defined academic cutoff criteria (minimum CGPA, branches, active backlogs).
+   - Evaluates applicant pools ranked by AI-driven candidate-job match compatibility scores.
+   - Inspects candidate profiles, downloads submitted resumes, and updates applicant lifecycle statuses.
+   - Schedules technical interviews and coordinates on-campus recruitment milestones.
+3. **Placement Cell Officer (`placement_officer`):**
+   - Reviews and approves or rejects incoming recruiter drive postings before student publication.
+   - Monitors institutional placement velocity, cohort conversion rates, and salary tier distributions.
+   - Generates NIRF/NAAC compliant placement audit reports and exports telemetry to CSV.
+4. **System Administrator (`admin`):**
+   - Manages the institutional user directory across all departments.
+   - Reassigns user roles, activates or deactivates accounts, and audits system access.
+   - Monitors system health, database readiness, and security integrity.
+
+---
+
+## 3. MAJOR IMPLEMENTED FEATURES
+
+- **Dual-Mode AI ATS Engine:**
+  - **Cloud LLM Mode:** Leverages Google Gemini 1.5 Flash for contextual resume parsing, skill extraction, and candidate-job matching.
+  - **Local Heuristic Mode:** Automatically activates a deterministic natural language processing (NLP) parser when a Gemini API key is absent or unreachable. Detects 36+ technical skills, validates contact details, and scores resumes with zero downtime.
+- **Five Procedural 3D WebGL Environments:**
+  - Full-screen procedural Three.js canvases rendered beneath the interface: *Digital River Valley* (Public/Landing), *Talent Network Core* (Auth), *Recruitment Connectivity Grid* (Recruiter/Placement/Admin), *Resume & Profile Studio* (Student), and *Opportunity Horizon* (Jobs/Applications).
+  - Background layers adhere to strict `pointer-events: none` and `z-index: 0` separation, guaranteeing zero interference with UI clicks or form inputs.
+- **Enterprise Security Hardening:**
+  - Short-lived JWT access tokens (15m) stored exclusively in memory via a dedicated client-side token broker.
+  - Rotating refresh tokens stored in MongoDB with SHA-256 hashing, token family invalidation, and replay attack detection.
+  - Double-submit HMAC-SHA256 CSRF protection separating pre-authentication and authenticated scopes.
+  - Strict ReDoS defense, password hashing with `bcryptjs`, and OWASP-compliant HTTP headers via `helmet`.
+- **Zero Mandatory External Services:**
+  - Automatically falls back to an embedded in-memory MongoDB instance (`mongodb-memory-server`) during local development if an external MongoDB daemon is not running.
+  - Works with or without Redis, SMTP, or Google OAuth.
+
+---
+
+## 4. VERIFIED ARCHITECTURE & TECHNOLOGY STACK
 
 ```
-Frontend (React)  <-->  Backend (Node/Express)  <-->  AI Service (Python/FastAPI)
-          \                                  /
-           \                                /
-            \-->  MongoDB Atlas (data store) <--/
++-----------------------------------------------------------------------------------------+
+|                                     FRONTEND SPA                                        |
+|  React 18.3 | TypeScript 5.5 | Vite 5.3 | Tailwind CSS 3.4 | TanStack React Query 5    |
+|  Three.js 0.187 (5 Procedural 3D Environments) | Lucide React Icons | Axios            |
++-----------------------------------------------------------------------------------------+
+                                             |
+                         HTTPS / TLS 1.3 | HTTP /api/v1 (CORS)
+                                             |
+                                             v
++-----------------------------------------------------------------------------------------+
+|                                  BACKEND REST API                                       |
+|  Node.js 20+ | Express 4.19 | TypeScript 5.5 | Mongoose 8.5                             |
+|  Double-Submit HMAC-SHA256 CSRF | MemoryStore Rate Limiting | Multer Disk Storage       |
+|  Dual-Mode AI Engine: Google Gemini 1.5 Flash OR Local Deterministic Heuristic NLP       |
++-----------------------------------------------------------------------------------------+
+                    |                                                    |
+                    v                                                    v
++-------------------------------------+             +-------------------------------------+
+|        DATABASE: MONGODB             |             |        PYTHON AI MICROSERVICE       |
+|  - MongoDB 6.0+ (Mongoose ODM)      |             |  - Python 3.10+ / FastAPI 0.109     |
+|  - Local Dev: MongoMemoryServer     |             |  - Pure-Python PyPDF & PDFPlumber   |
+|  - Docker: Named volume mongodb_data|             |  - Port 8000 (OpenAPI docs at /docs)|
++-------------------------------------+             +-------------------------------------+
 ```
 
-Services run on ports 3000 (frontend), 5000 (backend) and 8000 (AI service) by default when using the included scripts.
+---
 
-## Project structure
+## 5. REPOSITORY STRUCTURE
 
-- [ai-service](ai-service) — Python FastAPI microservice for NLP and resume analysis
-  - `main.py`, `app/` (models, parser, analyzer, skill_extractor, skill_matcher)
-- [backend](backend) — Node.js Express API and job/application logic
-  - `server.js`, `controllers/`, `models/`, `routes/`, `services/`
-- [frontend](frontend) — React SPA with 3D UI components and job application flows
-  - `src/`, `public/`, `build/`
-- Scripts and docs at repo root: `start-all.ps1`, `stop-all.ps1`, `DEPLOYMENT-GUIDE.md`, `TESTING-GUIDE.md`
+```text
+AI-CAMPUS-RECRUITMENT-SYSTEM01/
+│
+├── README.md                          # Canonical project documentation
+├── .env.example                       # Root Docker Compose environment template
+├── .gitignore                         # Comprehensive Git exclusion rules
+├── docker-compose.yml                 # Multi-container production Docker blueprint
+├── nginx.conf                         # Reverse proxy routing configuration
+│
+├── docs/                              # Technical specifications
+│   ├── ARCHITECTURE.md                # System topology, APIs & data flow
+│   ├── DEVELOPMENT.md                 # Local setup, scripts & testing guide
+│   ├── CONFIGURATION.md               # Environment variables & secrets guide
+│   ├── DEPLOYMENT.md                  # Live portfolio deployment instructions
+│   └── SECURITY.md                    # Authentication, session rotation & CSRF
+│
+├── frontend/                          # Client Single Page Application
+│   ├── src/
+│   │   ├── features/                  # Domain feature modules (auth, jobs, student, recruiter, etc.)
+│   │   └── shared/
+│   │       └── components/background/ # Protected Three.js 3D environments (17 files)
+│   ├── public/                        # Static assets (favicon.svg)
+│   ├── package.json                   # Frontend dependencies
+│   ├── tailwind.config.js             # Design tokens & contrast calibration
+│   └── vite.config.ts                 # Vite bundle configuration
+│
+├── backend/                           # Node.js / Express REST API
+│   ├── src/
+│   │   ├── config/                    # Database, Redis, Gemini & seed configurations
+│   │   ├── features/                  # Domain route controllers, models & services
+│   │   └── shared/                    # Middleware, security utils & crypto helpers
+│   ├── tests/                         # Jest unit & integration test suites (130 tests)
+│   ├── uploads/                       # Private resume file storage (.gitkeep)
+│   ├── package.json                   # Backend dependencies
+│   └── tsconfig.json                  # TypeScript compiler settings
+│
+├── ai-service/                        # Autonomous Python AI Microservice
+│   ├── app/                           # FastAPI routers, analyzers & skill extractors
+│   ├── tests/                         # Pytest test suite (7 tests)
+│   ├── main.py                        # Service entrypoint
+│   └── requirements.txt               # Pure-Python dependencies
+│
+└── .github/
+    └── workflows/ci.yml               # GitHub Actions CI pipeline
+```
 
-See the code for implementation details: [ai-service/main.py](ai-service/main.py), [backend/server.js](backend/server.js), [frontend/src/index.js](frontend/src/index.js).
+---
 
-## Requirements
-- Python 3.8+
-- Node.js 18+
-- npm or yarn
-- MongoDB (Atlas recommended)
+## 6. PREREQUISITES & INSTALLATION
 
-## Setup & Installation (local development)
+### Prerequisites
+- **Node.js:** `>= 20.0.0`
+- **npm:** `>= 10.0.0`
+- **Python:** `>= 3.10` *(for `ai-service`)*
+- **MongoDB:** *(Optional for local dev — in-memory server runs automatically)*
 
-1. Clone the repository and open the workspace.
+### Installation
+Clone the repository:
+```bash
+git clone https://github.com/your-username/ai-campus-recruitment.git
+cd ai-campus-recruitment
+```
 
-2. AI service (Python)
+Install backend dependencies:
+```bash
+cd backend
+npm install
+```
 
-```powershell
-cd ai-service
-python -m venv venv
-.\venv\Scripts\Activate.ps1
+Install frontend dependencies:
+```bash
+cd ../frontend
+npm install
+```
+
+Install AI service dependencies (optional):
+```bash
+cd ../ai-service
 pip install -r requirements.txt
-python -m spacy download en_core_web_sm
 ```
 
-3. Backend (Node.js)
+---
 
-## Project structure
+## 7. DEVELOPMENT STARTUP
 
-Below is a high-level, developer-friendly listing of folders and key files. Use this as a map to the implementation.
+### Running Locally (Zero Configuration)
+The system requires zero manual configuration out of the box.
 
-- Root
-  - `check-prerequisites.ps1` — environment checks for Windows
-  - `start-all.ps1`, `stop-all.ps1` — helper scripts to start/stop services
-  - `DEPLOYMENT-GUIDE.md`, `TESTING-GUIDE.md`, `SYSTEM-STATUS.md`, `CONNECTION_STATUS.md`, `FINAL-DELIVERY.md`
-  - `README.md` (this file)
+1. **Start Backend (Terminal 1):**
+   ```bash
+   cd backend
+   npm run build
+   npm start
+   ```
+   *Backend starts on `http://localhost:5000/api/v1` with embedded in-memory MongoDB and auto-seeds all 4 demo accounts.*
 
-- `ai-service/`
-  - `main.py` — FastAPI entrypoint
-  - `requirements.txt` — Python dependencies
-  - `app/`
-    - `__init__.py`
-    - `analyzer.py` — orchestration for analysis pipelines
-    - `config.py` — configuration loader
-    - `models.py` — Pydantic/data models
-    - `parser.py` — PDF/DOCX parsing utilities
-    - `skill_extractor.py` — spaCy-based extraction logic
-    - `skill_matcher.py` — semantic matching utilities (sentence-transformers)
+2. **Start Frontend (Terminal 2):**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   *Frontend starts on `http://localhost:5173`.*
 
-- `backend/`
-  - `package.json` — backend npm metadata & scripts
-  - `server.js` — Express app bootstrap
-  - `config/`
-    - `constants.js` — env variable defaults and constants
-    - `db.js` — MongoDB connection
-  - `controllers/`
-    - `adminController.js`
-    - `applicationController.js`
-    - `authController.js`
-    - `interviewController.js`
-    - `jobController.js`
-    - `notificationController.js`
-    - `resumeController.js`
-  - `middleware/`
-    - `authMiddleware.js`
-    - `errorHandler.js`
-    - `rateLimitMiddleware.js`
-    - `uploadMiddleware.js`
-  - `models/`
-    - `Application.js`, `Interview.js`, `Job.js`, `Notification.js`, `Resume.js`, `User.js`
-  - `resume/`
-    - `controllers/resumeController.js`
-    - `models/Resume.js`
-    - `routes/resumeRoutes.js`
-  - `routes/`
-    - `adminRoutes.js`, `applicationRoutes.js`, `authRoutes.js`, `interviewRoutes.js`, `jobRoutes.js`, `notificationRoutes.js`, `resumeRoutes.js`
-  - `services/`
-    - `aiService.js` — client to AI microservice
-    - `auditService.js`, `mailService.js`
-  - `uploads/`
-    - `resumes/` — stored resume files (uploads)
-  - `utils/`
-    - `fileValidation.js`, `helpers.js`
+3. **Open Browser:** Navigate to `http://localhost:5173/login` and log in with any seeded account:
+   - **Student:** `student@campus.edu` / `Password@123`
+   - **Recruiter:** `recruiter@campus.edu` / `Password@123`
+   - **Placement Officer:** `placement@campus.edu` / `Password@123`
+   - **Administrator:** `admin@campus.edu` / `Password@123`
 
-- `frontend/`
-  - `package.json` — frontend npm metadata & scripts
-  - `README.md` — frontend-specific notes
-  - `resumeai.py` — helper script (non-standard placement)
-  - `build/`
-    - `asset-manifest.json`, `index.html`, `manifest.json`, `robots.txt`, `static/` (css/js/media)
-  - `public/`
-    - `index.html`, `manifest.json`, `robots.txt`
-  - `src/`
-    - `App.js`, `App.css`, `index.js`, `index.css`
-    - `assets/` — static assets used by the app
-    - `components/` — UI components (3D scenes, navbar, cards, buttons)
-      - `AIResumeAnalyzer.jsx`, `Button3D.js`, `Card3D.js`, `DashboardTopBar.js`, `DynamicNavbar3D.js`, `Floating3DElements.js`, `GlobalSceneManager.js`, `Hero3DScene.js`, `LoadingSpinner3D.js`, `Navbar.js`, ...
-    - `pages/` — route pages (jobs, dashboard, auth, application flows)
-    - `services/`
-      - `api.js` — HTTP client to backend
-    - `utils/` — frontend utility helpers
+---
 
-This listing highlights the folders you will typically edit when developing features: `ai-service/app` for NLP logic, `backend/controllers` and `backend/services` for API behavior, and `frontend/src` for UI. For implementation entry points, see:
+## 8. COMMAND REFERENCE
 
-- `ai-service/main.py` (AI microservice)
-- `backend/server.js` (backend API)
-- `frontend/src/index.js` (frontend app)
+| Subsystem | Command | Description |
+| :--- | :--- | :--- |
+| **Backend** | `npm --prefix backend run build` | Compiles TypeScript source to `/backend/dist`. |
+| **Backend** | `npm --prefix backend start` | Starts compiled production server (`node dist/server.js`). |
+| **Backend** | `npm --prefix backend run dev` | Runs development server with hot-reload (`ts-node-dev`). |
+| **Backend** | `npm --prefix backend test` | Executes Jest test suites (130 tests across 11 suites). |
+| **Frontend** | `npm --prefix frontend run dev` | Runs Vite development server on port 5173. |
+| **Frontend** | `npm --prefix frontend run build` | Compiles TypeScript and builds production distribution in `/frontend/dist`. |
+| **Frontend** | `npm --prefix frontend run preview` | Previews production build locally. |
+| **AI Service**| `cd ai-service && python main.py` | Starts FastAPI service on port 8000. |
+| **AI Service**| `cd ai-service && pytest` | Runs Python resume parser test suite (7 tests). |
 
-> AI Campus Recruitment System — repository, VVIT campus recruitment project, 2026.
+---
 
-Include authors, contributors and supervisor names in your citation entry as appropriate.
+## 9. CONFIGURATION & ENVIRONMENT VARIABLES
 
-## License
+Refer to [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for full variable descriptions.
 
-This project is released under the ISC License.
+### Core Backend Variables (`/backend/.env`)
+```env
+NODE_ENV=development
+PORT=5000
+API_PREFIX=/api/v1
+CLIENT_URL=http://localhost:5173
+MONGODB_URI=mongodb://localhost:27017/ai_campus_recruitment
+
+# Authentication Secrets (Must be >= 32 chars in production)
+JWT_SECRET=super_secret_jwt_access_key_change_in_production_2026
+JWT_REFRESH_SECRET=super_secret_jwt_refresh_key_change_in_production_2026
+CSRF_SECRET=super_secret_csrf_key_change_in_production_2026
+
+# Portfolio Demonstration Flags
+ALLOW_PRODUCTION_SEED=true
+ALLOW_DEV_OTP=true
+
+# Optional Integrations
+GEMINI_API_KEY=
+REQUIRE_GEMINI=false
+REDIS_URL=
+GOOGLE_CLIENT_ID=
+UPLOAD_DIR=./uploads
+```
+
+### Core Frontend Variables (`/frontend/.env`)
+```env
+VITE_API_URL=http://localhost:5000/api/v1
+VITE_ENV=development
+```
+
+---
+
+## 10. AUTHENTICATION & SECURITY OVERVIEW
+
+- **In-Memory Access Tokens:** JWT access tokens (15m) are stored in client memory via `tokenBroker.ts` and never written to `localStorage` or `sessionStorage`.
+- **Rotating Refresh Tokens:** HttpOnly cookies (`__Host-refresh_token`) carry refresh tokens paired with MongoDB session documents (`ISession`). Automatic rotation detects replay attacks and invalidates compromised token families.
+- **Double-Submit CSRF Protection:** HMAC-SHA256 signatures validate state-changing requests, cryptographically bound to session IDs.
+- **PII & File Download Isolation:** Uploaded resumes stored on disk are strictly gated behind authenticated routes enforcing horizontal ownership checks.
+
+---
+
+## 11. DEPLOYMENT PREPARATION
+
+The repository is configured for immediate deployment using:
+1. **Docker Compose:** Run `cp .env.example .env && docker compose up -d --build`. Persists data to named Docker volumes.
+2. **PaaS Hosting:** Deploy frontend to Vercel/Netlify and backend to Render/Railway connected to a free-tier MongoDB Atlas cluster. Detailed walkthrough provided in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+---
+
+## 12. KNOWN LIMITATIONS & RETIRED TOOLING
+
+- **Retired Playwright E2E Infrastructure:** Standalone browser automation files and ephemeral screenshots were removed during repository consolidation. The test suite relies on 130 comprehensive Jest integration tests (`supertest`), Python `pytest`, and Vite production compilation checks.
+- **Email Delivery:** Production registrations require either configured SMTP credentials (`SMTP_HOST`, `SMTP_USER`, etc.) or the portfolio demonstration flag `ALLOW_DEV_OTP=true` (which logs verification OTPs to the server console).
+- **Google OAuth:** Backend endpoint `/api/v1/auth/google` is implemented and verified, but the web UI currently uses email/password authentication.
