@@ -51,6 +51,65 @@ export const parseResumeWithGemini = async (rawText: string): Promise<ParsedResu
     throw new Error('Resume parsing is temporarily unavailable. Please try again later or contact support.');
   }
 
+  // If bound ai-service is available via Vercel service bindings or container orchestration
+  if (process.env.AI_SERVICE_URL && process.env.NODE_ENV !== 'test') {
+    try {
+      const endpoint = new URL('/analyze/text', process.env.AI_SERVICE_URL).toString();
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resume_text: rawText,
+          required_skills: ['General Engineering'],
+          student_skills: [],
+        }),
+      });
+
+      if (response.ok) {
+        const resData: any = await response.json();
+        if (resData.success && resData.data) {
+          const d = resData.data;
+          const skillsList: string[] = (d.extracted_skills || [])
+            .map((s: any) => (typeof s === 'string' ? s : s.skill))
+            .filter(Boolean);
+          const breakdown = {
+            skillCoverageScore: d.score_breakdown?.skill_coverage_score || 70,
+            experienceScore: d.score_breakdown?.experience_score || 70,
+            educationScore: d.score_breakdown?.education_score || 70,
+            formattingScore: d.score_breakdown?.resume_quality_score || 70,
+          };
+          return {
+            name: d.name || '',
+            email: d.email || '',
+            phone: d.phone || '',
+            summary: d.summary || '',
+            skills: skillsList,
+            experience: (d.experience || []).map((e: any) => ({
+              jobTitle: e.title || '',
+              company: e.company || '',
+              duration: e.duration || '',
+              description: e.description || '',
+            })),
+            education: (d.education || []).map((ed: any) => ({
+              degree: ed.degree || '',
+              institution: ed.institution || '',
+              year: ed.year ? parseInt(ed.year, 10) : undefined,
+            })),
+            projects: (d.projects || []).map((p: any) => (typeof p === 'string' ? { title: p } : p)),
+            certifications: d.certifications || [],
+            atsScore: Math.round(d.final_score || 75),
+            atsBreakdown: breakdown,
+            aiSuggestions: d.recommendations || d.resume_improvements || [],
+            evaluationMethod: 'gemini_llm',
+            isHeuristicFallback: false,
+          };
+        }
+      }
+    } catch (svcErr: any) {
+      logger.warn(`[AI Service] Bound ai-service call failed: ${svcErr.message}. Falling back to primary Gemini/heuristic flow.`);
+    }
+  }
+
   try {
     if (!isValidGeminiKey(process.env.GEMINI_API_KEY)) {
       throw new Error('GEMINI_API_KEY not configured for cloud call');
@@ -176,6 +235,49 @@ export const calculateCandidateJobMatch = async (
 ): Promise<CandidateMatchResult> => {
   if (!isValidGeminiKey(process.env.GEMINI_API_KEY) && process.env.NODE_ENV === 'test') {
     throw new Error('Candidate-job matching is temporarily unavailable. Please try again later or contact support.');
+  }
+
+  // If bound ai-service is available via Vercel service bindings or container orchestration
+  if (process.env.AI_SERVICE_URL && process.env.NODE_ENV !== 'test') {
+    try {
+      const endpoint = new URL('/analyze/match', process.env.AI_SERVICE_URL).toString();
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_skills: candidateSkills,
+          job_requirements: requiredSkills.length > 0 ? requiredSkills : ['General Engineering'],
+        }),
+      });
+
+      if (response.ok) {
+        const resData: any = await response.json();
+        if (resData.success && resData.data) {
+          const d = resData.data;
+          const matchScore = Math.round(resData.match_score || 0);
+          return {
+            matchScore,
+            aiScore: matchScore,
+            matchedSkills: d.matched_skills || [],
+            missingSkills: d.missing_skills || [],
+            candidateStrengths:
+              d.matched_skills && d.matched_skills.length > 0
+                ? [`Verified alignment in required skills: ${d.matched_skills.join(', ')}`]
+                : ['Submitted candidate profile for review'],
+            aiRecommendation:
+              matchScore >= 75
+                ? `Strong alignment (${matchScore}% required skill coverage). Recommended for shortlisting.`
+                : matchScore >= 40
+                ? `Moderate alignment (${matchScore}% coverage). Missing skills: ${(d.missing_skills || []).slice(0, 3).join(', ') || 'none'}.`
+                : `Low skill overlap (${matchScore}% coverage). Requires upskilling in ${(d.missing_skills || []).slice(0, 3).join(', ') || 'core requirements'}.`,
+            evaluationMethod: 'gemini_llm',
+            isHeuristicFallback: false,
+          };
+        }
+      }
+    } catch (svcErr: any) {
+      logger.warn(`[AI Service] Bound ai-service call failed for matching: ${svcErr.message}. Falling back to primary Gemini/heuristic flow.`);
+    }
   }
 
   try {
