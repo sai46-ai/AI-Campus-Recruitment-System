@@ -1,0 +1,112 @@
+# 09 — Render Frontend, Backend, and AI Service Configuration
+
+**Deployment Platform:** Render Cloud Platform
+**Blueprint File:** `render.yaml` (Repository Root)
+
+---
+
+## 1. Blueprint Configuration Overview
+
+The entire three-service stack is orchestrated declaratively in `render.yaml`:
+
+```yaml
+# ==============================================================================
+# AI CAMPUS RECRUITMENT SYSTEM — RENDER INFRASTRUCTURE BLUEPRINT (render.yaml)
+# ==============================================================================
+# Architecture:
+#   1. ai-campus-frontend: Render Static Site (React 18 + Vite + Three.js)
+#   2. ai-campus-backend: Render Web Service (Node.js 20 + Express v2 + MongoDB Atlas)
+#   3. ai-campus-ai-service: Render Private Service (Python 3.10 + FastAPI + Pure Python NLP)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. FRONTEND STATIC SITE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: ai-campus-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install --include=dev && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://ai-campus-backend.onrender.com/api/v1
+
+  # ----------------------------------------------------------------------------
+  # 2. BACKEND API WEB SERVICE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: ai-campus-backend
+    runtime: node
+    rootDir: backend
+    plan: starter
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    disk:
+      name: resume-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CLIENT_URL
+        value: https://ai-campus-frontend.onrender.com
+      - key: ALLOW_VERCEL_PREVIEWS
+        value: "false"
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CSRF_SECRET
+        generateValue: true
+      - key: AI_SERVICE_URL
+        fromService:
+          type: pserv
+          name: ai-campus-ai-service
+          property: hostAndPort
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: ALLOW_PRODUCTION_SEED
+        value: "true"
+      - key: ALLOW_DEV_OTP
+        value: "true"
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # ----------------------------------------------------------------------------
+  # 3. AI MICROSERVICE (PRIVATE SERVICE)
+  # ----------------------------------------------------------------------------
+  - type: pserv
+    name: ai-campus-ai-service
+    runtime: python
+    rootDir: ai-service
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHON_VERSION
+        value: 3.10.12
+```
+
+---
+
+## 2. Key Operational Mechanisms
+
+1. **Clean Dependency Builds (`--include=dev`):**
+   Render builds execute `npm install --include=dev && npm run build`, ensuring `tsc` and `vite` are present in `node_modules/.bin` even if `NODE_ENV=production` is pre-set.
+2. **Private Networking via `fromService`:**
+   The backend environment variable `AI_SERVICE_URL` receives the internal DNS property `hostAndPort` from the private service `ai-campus-ai-service`. Requests travel within Render's internal VPC and are never routed over the public internet.
+3. **Health Check Probing:**
+   Render probes `ai-campus-backend` at `/api/v1/health`. If healthy (returns 200 with `{ status: "ok" }`), traffic is shifted to the new deployment with zero-downtime rolling deploys.
