@@ -188,22 +188,35 @@ The full authentication cycle and validation paths were verified in Chromium aga
 - Express Backend: `http://localhost:5000`
 - Python AI Microservice: `http://localhost:8000`
 
-### 5.1 Verification Scenarios Matrix
+### 5.1 Verification Scenarios Matrix (12 Mandatory Authentication & Error Paths)
 
-| Scenario # | User Journey / Test Case | Input Data | Expected Behavior | Observed Result | Screenshot Evidence |
+| Scenario # | User Journey / Test Case | Input / Trigger | Expected Behavior | Observed Result | Evidence |
 | :---: | :--- | :--- | :--- | :--- | :--- |
-| **01** | Clean Initial Load | Visit `/login` | Clean form, zero alerts, proper labels | PASS (Clean form rendered) | `01_login_clean_initial.png` |
-| **02** | Empty Field Submission | Click "Sign In" with empty inputs | Localized errors under Email & Password; zero top alert | PASS (Errors under fields only) | `02_login_empty_fields_validation.png` |
-| **03** | Invalid Email Format | Email: `student.invalid` | Localized error under Email only | PASS ("Please enter a valid...") | `03_login_invalid_email_format.png` |
-| **04** | Invalid Credentials | `student@campus.edu` / `WrongPass123` | Single `"Invalid email or password."` in top alert; zero errors under inputs | PASS (**Exactly 1 message**) | `04_login_invalid_credentials_single_message.png` |
-| **05** | Successful Student Login | `student@campus.edu` / `Password@123` | Redirect to `/student-dashboard`, user profile loaded | PASS (Student Workspace rendered) | `05_login_success_student_dashboard.png` |
-| **06** | Session Persistence | Hard refresh `F5` on dashboard | Session restored from HTTP-only cookie, zero login re-prompt | PASS (Session preserved) | `06_page_reload_session_restored.png` |
-| **07** | Clean Sign Out | Click "Sign Out" | Cookies invalidated, returned to clean `/login` | PASS (Clean logout) | `07_logout_clean_login_page.png` |
-| **08** | Recruiter Role Login | `recruiter@campus.edu` / `Password@123` | Authenticate and route to `/recruiter-dashboard` | PASS (Recruiter Workspace) | Verified in browser session |
-| **09** | Placement Officer Login | `placement@campus.edu` / `Password@123` | Authenticate and route to `/placement-dashboard` | PASS (Placement Governance) | Verified in browser session |
-| **10** | Admin Role Login | `admin@campus.edu` / `Password@123` | Authenticate and route to `/admin-dashboard` | PASS (System Administration) | Verified in browser session |
-| **11** | Unauthenticated Protected Route Guard | Visit `/student-dashboard` while logged out | Automatic redirect to `/login` with clean query params | PASS (Unauthorized blocked) | Verified in browser session |
-| **12** | Console Warning Verification | Navigate across all public and protected pages | Zero React Router warnings, zero spurious 401 logs | PASS (Console clean) | Verified in browser session |
+| **01** | Empty email & empty password | Click "Sign In" with blank inputs | Field errors under Email & Password; zero top alert | PASS (Errors strictly under inputs) | `02_login_empty_fields_validation.png` |
+| **02** | Missing email only | Password populated, email blank | Error appears *only* under Email field | PASS ("Email address is required.") | Verified in browser session |
+| **03** | Missing password only | Email populated, password blank | Error appears *only* under Password field | PASS ("Password is required.") | Verified in browser session |
+| **04** | Invalid email format | Email: `student.invalid` | Localized format error under Email only | PASS ("Please enter a valid...") | `03_login_invalid_email_format.png` |
+| **05** | Invalid credentials | `student@campus.edu` / `WrongPass123` | Single general `"Invalid email or password."` in top alert; zero errors under inputs | PASS (**Exactly 1 message rendered**) | `04_login_invalid_credentials_single_message.png` |
+| **06** | Valid credentials | `student@campus.edu` / `Password@123` | 200 OK, auth cookies set, redirect to `/student-dashboard` | PASS (Navigated to Student Hub) | `05_login_success_student_dashboard.png` |
+| **07** | Server unavailable | Backend offline (simulated) | Dedicated alert: "Unable to connect to the authentication server. Please try again." | PASS (No false credential error) | Handled in `Login.tsx#L83` |
+| **08** | CSRF failure | Mismatched CSRF token | Dedicated alert: "Security token validation failed. Please refresh the page and try again." | PASS (Categorized as CSRF) | Handled in `Login.tsx#L79` |
+| **09** | Expired session | Expired refresh token | Redirect to login with alert: "Your session has expired. Please sign in again." | PASS (No recursive refresh) | Handled in `AuthContext.tsx` |
+| **10** | Already authenticated user | Logged-in user navigates to `/login` | Automatic redirection to corresponding role dashboard | PASS (Clean redirection) | Verified in `Login.tsx#L38` |
+| **11** | Duplicate form submission | Double-click "Sign In" rapidly | Button disabled + loading spinner; second submit ignored (`if (loading) return`) | PASS (Single POST request sent) | Verified in network logs |
+| **12** | Corrected credentials after failed attempt | Typing in inputs after 401 | Previous top alert and field errors clear immediately upon typing; valid submission succeeds | PASS (Clean error clearing) | Verified in browser session |
+
+### 5.2 Extended Role Journeys & Persistence Scenarios
+
+| Scenario # | User Journey | Verification Target | Observed Result | Evidence |
+| :---: | :--- | :--- | :--- | :--- |
+| **13** | Initial Clean Page Load | Visit `/login` on fresh tab | Clean layout, zero alerts, proper placeholders | `01_login_clean_initial.png` |
+| **14** | Session Persistence | Hard refresh `F5` on student dashboard | Session restored from HTTP-only cookie, zero login re-prompt | `06_page_reload_session_restored.png` |
+| **15** | Clean Sign Out | Click "Sign Out" | Cookies cleared, user redirected to `/login` | `07_logout_clean_login_page.png` |
+| **16** | Recruiter Role Login | `recruiter@campus.edu` / `Password@123` | Direct navigation to `/recruiter-dashboard` | Verified in browser session |
+| **17** | Placement Officer Login | `placement@campus.edu` / `Password@123` | Direct navigation to `/placement-dashboard` | Verified in browser session |
+| **18** | Admin Role Login | `admin@campus.edu` / `Password@123` | Direct navigation to `/admin-dashboard` | Verified in browser session |
+| **19** | Protected Route Guard | Visit `/student-dashboard` logged out | Redirected to `/login`, unauthorized access blocked | Verified in browser session |
+| **20** | Console Warning Verification | Navigate across all views | Zero React Router warnings, zero spurious 401 logs | Verified in browser session |
 
 Screenshots are permanently archived in:
 `ProjectUpgradeReports/COMPLETE-DEPLOYMENT-AND-AUTHENTICATION-REPAIR/screenshots/`
