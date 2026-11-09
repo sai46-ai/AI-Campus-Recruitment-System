@@ -99,7 +99,7 @@ export const PlatformCapabilities: React.FC = () => {
       description:
         "Analyzes uploaded PDF/DOCX resumes, extracting structured candidate profiles, academic history, and technical competencies without manual re-entry.",
       features: [
-        "Semantic skill ontology extraction across engineering disciplines",
+        "Multi-tier NLP & taxonomy skill extraction across engineering disciplines",
         "Deterministic CGPA, degree, and graduation timeline parsing",
         "Zero data transmission to unverified third-party brokers",
       ],

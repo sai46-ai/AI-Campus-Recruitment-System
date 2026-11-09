@@ -92,3 +92,24 @@
 - **Affected Files:** `frontend/src/shared/services/api.ts`, `frontend/src/shared/services/tokenBroker.ts`
 - **Resolution:** Normalized base URL sanitization (stripping trailing slashes) in both files while preserving environment-driven configuration.
 - **Status:** **VERIFIED & NORMALIZED**
+
+---
+
+### Issue ERR-07: Authentication Error Triplication on Login Screen
+- **UI Display:**
+  ```text
+  Sign In to Your Workspace
+  Enter your institutional credentials to continue
+  Invalid email or password
+
+  Institutional Email
+  Invalid email or password
+
+  Password
+  Invalid email or password
+  ```
+- **Severity:** High (UI defect causing severe confusion and accessibility violations)
+- **Root Cause:** In `frontend/src/features/auth/Login.tsx`, the component received the server error string `"Invalid email or password"`. To conditionally route error messages to inputs, the code used `error?.includes('email') ? error : undefined` and `error?.includes('password') ? error : undefined`. Because the string contained both words, the identical error message was rendered three times (under the header, under email, and under password).
+- **Affected Files:** `frontend/src/features/auth/Login.tsx`, `frontend/src/features/auth/Register.tsx`, `frontend/src/shared/components/ui/Input.tsx`
+- **Resolution:** Decoupled client-side synchronous field validation (`fieldErrors`) from server-side authentication alerts (`formError`). Server-side failures render once in the dedicated top alert box; field errors render only below their respective inputs upon empty/malformed submission. Added accessible `aria-invalid`, `aria-describedby`, and `<p id={errorId} role="alert">` tags in `Input.tsx`.
+- **Status:** **REPAIRED** (Verified with Playwright scenarios 01–07 and archived screenshots)

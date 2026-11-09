@@ -7,34 +7,64 @@ import { Button } from '../../shared/components/ui/Button';
 import { Input } from '../../shared/components/ui/Input';
 import { AuthSecurityShield } from '../../shared/components/security/AuthSecurityShield';
 
+interface LoginFieldErrors {
+  email?: string;
+  password?: string;
+}
+
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<LoginFieldErrors>({});
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (fieldErrors.email) {
+      setFieldErrors((prev) => ({ ...prev, email: undefined }));
+    }
+    if (formError) setFormError('');
+  };
+
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (fieldErrors.password) {
+      setFieldErrors((prev) => ({ ...prev, password: undefined }));
+    }
+    if (formError) setFormError('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return; // Prevent duplicate submissions
+
+    const errors: LoginFieldErrors = {};
     if (!email.trim()) {
-      setError('Email address is required.');
-      return;
+      errors.email = 'Email address is required.';
+    } else if (!/\S+@\S+\.\S+/.test(email.trim())) {
+      errors.email = 'Please enter a valid email address.';
     }
-    if (!/\S+@\S+\.\S+/.test(email.trim())) {
-      setError('Please enter a valid email address.');
-      return;
-    }
+
     if (!password) {
-      setError('Password is required.');
+      errors.password = 'Password is required.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setFormError('');
       return;
     }
-    setError('');
+
+    setFieldErrors({});
+    setFormError('');
     setLoading(true);
 
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email: email.trim(), password });
       const { user, accessToken } = res.data.data;
       login(user, accessToken);
 
@@ -43,7 +73,20 @@ export const Login: React.FC = () => {
       else if (user.role === 'admin' || user.role === 'super_admin') navigate('/admin-dashboard');
       else navigate('/student-dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      const status = err.response?.status;
+      const serverMsg = err.response?.data?.message;
+
+      if (status === 401) {
+        setFormError('Invalid email or password.');
+      } else if (status === 403) {
+        setFormError('Security verification failed. Please refresh and try again.');
+      } else if (!err.response || err.code === 'ECONNABORTED' || err.message?.includes('Network Error')) {
+        setFormError('Unable to connect to the server. Please check your connection and try again.');
+      } else if (status >= 500) {
+        setFormError('The service is temporarily unavailable. Please try again later.');
+      } else {
+        setFormError(serverMsg || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -86,9 +129,13 @@ export const Login: React.FC = () => {
               </p>
             </div>
 
-            {error && (
-              <div className="p-3 rounded-xl bg-[#FEE2E2] text-[#991B1B] border border-red-400/40 text-xs font-medium mb-5" role="alert">
-                {error}
+            {formError && (
+              <div
+                className="p-3 rounded-xl bg-[#FEE2E2] text-[#991B1B] border border-red-400/40 text-xs font-medium mb-5"
+                role="alert"
+                aria-live="assertive"
+              >
+                {formError}
               </div>
             )}
 
@@ -98,10 +145,10 @@ export const Login: React.FC = () => {
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleEmailChange(e.target.value)}
                 placeholder="user@university.edu"
                 icon={<Mail className="w-4 h-4 text-[#516861]" aria-hidden="true" />}
-                error={error?.includes('email') ? error : undefined}
+                error={fieldErrors.email}
                 autoComplete="email"
                 disabled={loading}
               />
@@ -111,10 +158,10 @@ export const Login: React.FC = () => {
                 type="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handlePasswordChange(e.target.value)}
                 placeholder="••••••••"
                 icon={<Lock className="w-4 h-4 text-[#516861]" aria-hidden="true" />}
-                error={error?.includes('password') ? error : undefined}
+                error={fieldErrors.password}
                 autoComplete="current-password"
                 disabled={loading}
               />

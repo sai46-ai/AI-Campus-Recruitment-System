@@ -11,8 +11,8 @@ export const seedDatabase = async (): Promise<void> => {
   }
 
   try {
-    const adminCount = await User.countDocuments({ role: UserRole.ADMIN });
-    if (adminCount === 0) {
+    const admin = await User.findOne({ email: 'admin@campus.edu' });
+    if (!admin) {
       logger.info('[Seed] Initializing primary administrator account...');
       await User.create({
         name: 'System Administrator',
@@ -25,8 +25,8 @@ export const seedDatabase = async (): Promise<void> => {
       logger.info('[Seed] Primary administrator account initialized successfully.');
     }
 
-    const studentCount = await User.countDocuments({ role: UserRole.STUDENT });
-    if (studentCount === 0) {
+    const student = await User.findOne({ email: 'student@campus.edu' });
+    if (!student) {
       logger.info('[Seed] Initializing sample student account...');
       await User.create({
         name: 'Aarav Sharma',
@@ -44,8 +44,8 @@ export const seedDatabase = async (): Promise<void> => {
       logger.info('[Seed] Sample student account initialized successfully.');
     }
 
-    const recruiterCount = await User.countDocuments({ role: UserRole.RECRUITER });
-    if (recruiterCount === 0) {
+    const recruiter = await User.findOne({ email: 'recruiter@campus.edu' });
+    if (!recruiter) {
       logger.info('[Seed] Initializing verified recruiter account...');
       await User.create({
         name: 'Priya Mehta',
@@ -59,8 +59,8 @@ export const seedDatabase = async (): Promise<void> => {
       logger.info('[Seed] Verified recruiter account initialized successfully.');
     }
 
-    const poCount = await User.countDocuments({ role: UserRole.PLACEMENT_OFFICER });
-    if (poCount === 0) {
+    const po = await User.findOne({ email: 'placement@campus.edu' });
+    if (!po) {
       logger.info('[Seed] Initializing placement officer account...');
       await User.create({
         name: 'Dr. Rajesh Verma',

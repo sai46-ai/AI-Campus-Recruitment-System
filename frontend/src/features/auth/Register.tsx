@@ -6,6 +6,13 @@ import { Button } from '../../shared/components/ui/Button';
 import { Input } from '../../shared/components/ui/Input';
 import { AuthSecurityShield } from '../../shared/components/security/AuthSecurityShield';
 
+interface RegisterFieldErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  otpCode?: string;
+}
+
 export const Register: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'recruiter' ? 'recruiter' : 'student';
@@ -22,6 +29,7 @@ export const Register: React.FC = () => {
     company: '',
     phone: '',
   });
+  const [fieldErrors, setFieldErrors] = useState<RegisterFieldErrors>({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [verificationPending, setVerificationPending] = useState(false);
@@ -39,23 +47,48 @@ export const Register: React.FC = () => {
   }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors[name as keyof RegisterFieldErrors]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+    if (error) setError('');
+  };
+
+  const handleOtpChange = (val: string) => {
+    setOtpCode(val);
+    if (fieldErrors.otpCode) {
+      setFieldErrors((prev) => ({ ...prev, otpCode: undefined }));
+    }
+    if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
+    const errors: RegisterFieldErrors = {};
     if (!formData.name.trim()) {
-      setError('Full name is required.');
+      errors.name = 'Full name is required.';
+    }
+    if (!formData.email.trim()) {
+      errors.email = 'Email address is required.';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+      errors.email = 'Please provide a valid email address.';
+    }
+    if (!formData.password) {
+      errors.password = 'Password is required.';
+    } else if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters long.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setError('');
       return;
     }
-    if (!formData.email.trim() || !/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-      setError('Please provide a valid email address.');
-      return;
-    }
-    if (!formData.password || formData.password.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      return;
-    }
+
+    setFieldErrors({});
     setError('');
     setLoading(true);
 
@@ -85,10 +118,18 @@ export const Register: React.FC = () => {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpCode.trim() || !/^\d{6}$/.test(otpCode.trim())) {
-      setError('Please enter a valid 6-digit verification code.');
+    if (loading) return;
+
+    if (!otpCode.trim()) {
+      setFieldErrors({ otpCode: 'Verification code is required.' });
       return;
     }
+    if (!/^\d{6}$/.test(otpCode.trim())) {
+      setFieldErrors({ otpCode: 'Please enter a valid 6-digit verification code.' });
+      return;
+    }
+
+    setFieldErrors({});
     setError('');
     setLoading(true);
     try {
@@ -160,10 +201,11 @@ export const Register: React.FC = () => {
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onChange={(e) => handleOtpChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 minLength={6}
                 maxLength={6}
                 required
+                error={fieldErrors.otpCode}
                 disabled={loading}
               />
               <Button type="submit" variant="primary" size="lg" className="w-full py-3.5" isLoading={loading} disabled={loading || otpCode.length !== 6}>
@@ -212,6 +254,7 @@ export const Register: React.FC = () => {
                 placeholder="Student / HR Manager Name"
                 icon={<User className="w-5 h-5" aria-hidden="true" />}
                 autoComplete="name"
+                error={fieldErrors.name}
                 disabled={loading}
               />
 
@@ -225,6 +268,7 @@ export const Register: React.FC = () => {
                 placeholder="user@university.edu"
                 icon={<Mail className="w-5 h-5" aria-hidden="true" />}
                 autoComplete="email"
+                error={fieldErrors.email}
                 disabled={loading}
               />
 
@@ -239,6 +283,7 @@ export const Register: React.FC = () => {
                 placeholder="Min. 8 characters"
                 icon={<Lock className="w-5 h-5" aria-hidden="true" />}
                 autoComplete="new-password"
+                error={fieldErrors.password}
                 disabled={loading}
                 helperText="At least 8 characters"
               />

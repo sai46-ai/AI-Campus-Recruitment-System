@@ -24,6 +24,7 @@ Every defect reported in the browser console has been traced to its root cause, 
 5. **ClientLogger Session Expired Warning (`clientLogger.ts:15`):** Prevented false warnings by verifying whether the client previously held an active session before emitting warnings or redirecting.
 6. **Port 5000 Network Requests:** Verified as local development defaults (`VITE_API_URL` falling back to `http://localhost:5000/api/v1` during `import.meta.env.DEV`). Normalized API base URLs in `api.ts` and `tokenBroker.ts` to ensure seamless HTTPS operation on Render.
 7. **Render Multi-Service Blueprint:** Restored `ai-campus-frontend` (Static Site), `ai-campus-backend` (Web Service), and `ai-campus-ai-service` (Private Microservice) in `render.yaml` with `--include=dev` npm install commands preventing `tsc: command not found`.
+8. **Authentication Error Triplication & UI Text Accuracy:** Resolved the defect where `"Invalid email or password"` was rendered three times (under page heading, email, and password). Decoupled client-side `fieldErrors` from server-side `formError`, added WCAG 2.1 AA `aria-invalid`/`aria-describedby` accessibility attributes to inputs, audited copy across all workspaces, and compiled comprehensive documentation in Report 15.
 
 ---
 
