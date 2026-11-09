@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only --exit-child src/server.ts",
     "clean": "rimraf dist",
+    "lint": "tsc --noEmit",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "dependencies": {

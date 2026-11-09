@@ -71,10 +71,11 @@ export const getRefreshCookieName = (isSecure: boolean = false) =>
 
 export const sendRefreshTokenCookie = (res: Response, token: string, maxAgeMs: number = 604800000, isSecure: boolean = false) => {
   const cookieName = getRefreshCookieName(isSecure);
+  const sameSiteMode: 'none' | 'lax' = isSecure ? 'none' : 'lax';
   res.cookie(cookieName, token, {
     httpOnly: true,
     secure: isSecure,
-    sameSite: 'lax',
+    sameSite: sameSiteMode,
     path: '/',
     maxAge: maxAgeMs,
   });
@@ -83,7 +84,7 @@ export const sendRefreshTokenCookie = (res: Response, token: string, maxAgeMs: n
     res.cookie('refreshToken', token, {
       httpOnly: true,
       secure: isSecure,
-      sameSite: 'lax',
+      sameSite: sameSiteMode,
       path: '/',
       maxAge: maxAgeMs,
     });
@@ -92,17 +93,18 @@ export const sendRefreshTokenCookie = (res: Response, token: string, maxAgeMs: n
 
 export const clearRefreshTokenCookie = (res: Response, isSecure: boolean = false) => {
   const cookieName = getRefreshCookieName(isSecure);
+  const sameSiteMode: 'none' | 'lax' = isSecure ? 'none' : 'lax';
   res.cookie(cookieName, '', {
     httpOnly: true,
     secure: isSecure,
-    sameSite: 'lax',
+    sameSite: sameSiteMode,
     path: '/',
     expires: new Date(0),
   });
   res.cookie('refreshToken', '', {
     httpOnly: true,
     secure: isSecure,
-    sameSite: 'lax',
+    sameSite: sameSiteMode,
     path: '/',
     expires: new Date(0),
   });

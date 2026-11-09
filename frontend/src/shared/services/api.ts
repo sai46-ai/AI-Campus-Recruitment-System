@@ -7,6 +7,7 @@ import {
   executeCoordinatedRefresh,
   fetchFreshCsrfToken,
 } from './tokenBroker';
+import clientLogger from '../utils/clientLogger';
 
 const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:5000/api/v1');
 
@@ -20,6 +21,14 @@ api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Attach X-Correlation-ID for cross-service request tracing
+  if (!config.headers['X-Correlation-ID']) {
+    const correlationId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `req-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    config.headers['X-Correlation-ID'] = correlationId;
   }
 
   // Attach X-CSRF-Token for state-changing requests
@@ -39,6 +48,11 @@ api.interceptors.response.use(
   async (err) => {
     const req = err.config;
     if (!req) return Promise.reject(err);
+
+    const correlationId = err.response?.headers?.['x-correlation-id'] || err.response?.data?.correlationId;
+    if (correlationId) {
+      err.correlationId = correlationId;
+    }
 
     // 1. Handle 401 Unauthorized via coordinated in-memory refresh
     if (err.response?.status === 401 && !req._retry) {
@@ -62,6 +76,7 @@ api.interceptors.response.use(
         if (refErr?.response?.data) {
           refErr.response.data.message = 'Your session has expired. Please sign in again.';
         }
+        clientLogger.warn('Authentication session expired, redirecting to login');
         return Promise.reject(refErr);
       }
     }

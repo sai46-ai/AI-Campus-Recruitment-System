@@ -475,7 +475,7 @@ export const getCsrfToken = asyncHandler(async (req: Request, res: Response) => 
   res.cookie(cookieName, preSessionId, {
     httpOnly: true,
     secure: isSecure,
-    sameSite: 'lax',
+    sameSite: isSecure ? 'none' : 'lax',
     path: '/',
     maxAge: 15 * 60 * 1000,
   });

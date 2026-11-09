@@ -99,19 +99,16 @@ The application enforces server-side Role-Based Access Control (RBAC) across fou
 AI-CAMPUS-RECRUITMENT-SYSTEM01/
 │
 ├── README.md                          # Canonical project documentation
+├── render.yaml                        # Render Infrastructure-as-Code Blueprint (3 services)
 ├── .env.example                       # Root Docker Compose environment template
 ├── .gitignore                         # Comprehensive Git exclusion rules
 ├── docker-compose.yml                 # Multi-container production Docker blueprint
 ├── nginx.conf                         # Reverse proxy routing configuration
 │
-├── docs/                              # Technical specifications
-│   ├── ARCHITECTURE.md                # System topology, APIs & data flow
-│   ├── DEVELOPMENT.md                 # Local setup, scripts & testing guide
-│   ├── CONFIGURATION.md               # Environment variables & secrets guide
-│   ├── DEPLOYMENT.md                  # Live portfolio deployment instructions
-│   └── SECURITY.md                    # Authentication, session rotation & CSRF
+├── ProjectUpgradeReports/             # Comprehensive technical audit reports
+│   └── RENDER-PRODUCTION-READINESS/   # Verification reports, runbooks & deployment specs
 │
-├── frontend/                          # Client Single Page Application
+├── frontend/                          # Client Single Page Application (React 18 + Vite)
 │   ├── src/
 │   │   ├── features/                  # Domain feature modules (auth, jobs, student, recruiter, etc.)
 │   │   └── shared/
@@ -121,19 +118,19 @@ AI-CAMPUS-RECRUITMENT-SYSTEM01/
 │   ├── tailwind.config.js             # Design tokens & contrast calibration
 │   └── vite.config.ts                 # Vite bundle configuration
 │
-├── backend/                           # Node.js / Express REST API
+├── backend/                           # Node.js / Express REST API Gateway
 │   ├── src/
 │   │   ├── config/                    # Database, Redis, Gemini & seed configurations
-│   │   ├── features/                  # Domain route controllers, models & services
+│   │   ├── features/                  # Business domains (admin, ai, auth, jobs, resumes, etc.)
 │   │   └── shared/                    # Middleware, security utils & crypto helpers
-│   ├── tests/                         # Jest unit & integration test suites (130 tests)
+│   ├── tests/                         # Jest unit & integration test suites (152 tests across 13 suites)
 │   ├── uploads/                       # Private resume file storage (.gitkeep)
 │   ├── package.json                   # Backend dependencies
 │   └── tsconfig.json                  # TypeScript compiler settings
 │
-├── ai-service/                        # Autonomous Python AI Microservice
+├── ai-service/                        # Autonomous Python AI Microservice (FastAPI)
 │   ├── app/                           # FastAPI routers, analyzers & skill extractors
-│   ├── tests/                         # Pytest test suite (7 tests)
+│   ├── tests/                         # Python test suite (7 tests)
 │   ├── main.py                        # Service entrypoint
 │   └── requirements.txt               # Pure-Python dependencies
 │
@@ -154,8 +151,8 @@ AI-CAMPUS-RECRUITMENT-SYSTEM01/
 ### Installation
 Clone the repository:
 ```bash
-git clone https://github.com/your-username/ai-campus-recruitment.git
-cd ai-campus-recruitment
+git clone https://github.com/sai46-ai/AI-Campus-Recruitment-System.git
+cd AI-Campus-Recruitment-System
 ```
 
 Install backend dependencies:
@@ -213,18 +210,18 @@ The system requires zero manual configuration out of the box.
 | **Backend** | `npm --prefix backend run build` | Compiles TypeScript source to `/backend/dist`. |
 | **Backend** | `npm --prefix backend start` | Starts compiled production server (`node dist/server.js`). |
 | **Backend** | `npm --prefix backend run dev` | Runs development server with hot-reload (`ts-node-dev`). |
-| **Backend** | `npm --prefix backend test` | Executes Jest test suites (130 tests across 11 suites). |
+| **Backend** | `npm --prefix backend test` | Executes Jest test suites (152 tests across 13 suites). |
 | **Frontend** | `npm --prefix frontend run dev` | Runs Vite development server on port 5173. |
 | **Frontend** | `npm --prefix frontend run build` | Compiles TypeScript and builds production distribution in `/frontend/dist`. |
 | **Frontend** | `npm --prefix frontend run preview` | Previews production build locally. |
 | **AI Service**| `cd ai-service && python main.py` | Starts FastAPI service on port 8000. |
-| **AI Service**| `cd ai-service && pytest` | Runs Python resume parser test suite (7 tests). |
+| **AI Service**| `python -m unittest discover -s ai-service/tests` | Runs Python resume parser test suite (7 tests). |
 
 ---
 
 ## 9. CONFIGURATION & ENVIRONMENT VARIABLES
 
-Refer to [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for full variable descriptions.
+Refer to [`ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/07_ENVIRONMENT_VARIABLE_AND_STORAGE_MATRIX.md`](ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/07_ENVIRONMENT_VARIABLE_AND_STORAGE_MATRIX.md) for full variable descriptions.
 
 ### Core Backend Variables (`/backend/.env`)
 ```env
@@ -238,6 +235,9 @@ MONGODB_URI=mongodb://localhost:27017/ai_campus_recruitment
 JWT_SECRET=super_secret_jwt_access_key_change_in_production_2026
 JWT_REFRESH_SECRET=super_secret_jwt_refresh_key_change_in_production_2026
 CSRF_SECRET=super_secret_csrf_key_change_in_production_2026
+
+# Internal AI Microservice URL (FastAPI)
+AI_SERVICE_URL=http://localhost:8000
 
 # Portfolio Demonstration Flags
 ALLOW_PRODUCTION_SEED=true
@@ -262,7 +262,7 @@ VITE_ENV=development
 ## 10. AUTHENTICATION & SECURITY OVERVIEW
 
 - **In-Memory Access Tokens:** JWT access tokens (15m) are stored in client memory via `tokenBroker.ts` and never written to `localStorage` or `sessionStorage`.
-- **Rotating Refresh Tokens:** HttpOnly cookies (`__Host-refresh_token`) carry refresh tokens paired with MongoDB session documents (`ISession`). Automatic rotation detects replay attacks and invalidates compromised token families.
+- **Rotating Refresh Tokens:** HttpOnly cookies (`__Host-refresh_token` or `refresh_token`) carry refresh tokens paired with MongoDB session documents (`ISession`). Automatic rotation detects replay attacks and invalidates compromised token families. Cross-subdomain HTTPS requests utilize `SameSite=None; Secure=true`.
 - **Double-Submit CSRF Protection:** HMAC-SHA256 signatures validate state-changing requests, cryptographically bound to session IDs.
 - **PII & File Download Isolation:** Uploaded resumes stored on disk are strictly gated behind authenticated routes enforcing horizontal ownership checks.
 
@@ -270,14 +270,18 @@ VITE_ENV=development
 
 ## 11. DEPLOYMENT PREPARATION
 
-The repository is configured for immediate deployment using:
-1. **Docker Compose:** Run `cp .env.example .env && docker compose up -d --build`. Persists data to named Docker volumes.
-2. **PaaS Hosting:** Deploy frontend to Vercel/Netlify and backend to Render/Railway connected to a free-tier MongoDB Atlas cluster. Detailed walkthrough provided in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+The repository is configured for immediate cloud and container deployment:
+1. **Render Cloud Platform (Recommended):** Deploy via Blueprint using [`render.yaml`](render.yaml) orchestrating:
+   - Frontend: Render Static Site (`ai-campus-frontend`)
+   - Backend: Render Web Service (`ai-campus-backend`, Starter plan with 1 GB Persistent Disk mounted at `/var/data`)
+   - AI Microservice: Render Private Service (`ai-campus-ai-service`)
+   - Step-by-step walkthrough provided in [`ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/08_DEPLOYMENT_RUNBOOK_AND_ROLLBACK.md`](ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/08_DEPLOYMENT_RUNBOOK_AND_ROLLBACK.md).
+2. **Docker Compose:** Run `cp .env.example .env && docker compose up -d --build`. Persists data to named Docker volumes.
 
 ---
 
 ## 12. KNOWN LIMITATIONS & RETIRED TOOLING
 
-- **Retired Playwright E2E Infrastructure:** Standalone browser automation files and ephemeral screenshots were removed during repository consolidation. The test suite relies on 130 comprehensive Jest integration tests (`supertest`), Python `pytest`, and Vite production compilation checks.
+- **Automated Test Coverage:** The test suite relies on 152 comprehensive Jest integration tests (`supertest`) across 13 suites, Python unit tests (7 tests), and Vite production compilation checks.
 - **Email Delivery:** Production registrations require either configured SMTP credentials (`SMTP_HOST`, `SMTP_USER`, etc.) or the portfolio demonstration flag `ALLOW_DEV_OTP=true` (which logs verification OTPs to the server console).
 - **Google OAuth:** Backend endpoint `/api/v1/auth/google` is implemented and verified, but the web UI currently uses email/password authentication.

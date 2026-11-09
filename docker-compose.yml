@@ -40,6 +40,7 @@ services:
       CSRF_SECRET: ${CSRF_SECRET:-production_secure_csrf_secret_min_32_characters_2026}
       ALLOW_PRODUCTION_SEED: ${ALLOW_PRODUCTION_SEED:-true}
       ALLOW_DEV_OTP: ${ALLOW_DEV_OTP:-true}
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8000}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     volumes:

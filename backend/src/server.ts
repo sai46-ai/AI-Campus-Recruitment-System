@@ -15,7 +15,7 @@ const startServer = async () => {
     await connectRedis();
     await seedDatabase();
 
-    const server = app.listen(PORT, () => {
+    const server = app.listen(Number(PORT), '0.0.0.0', () => {
       logger.info(`===========================================================`);
       logger.info(`  AI Campus Recruitment System - Backend API v2.0.0`);
       logger.info(`  Server running in [${process.env.NODE_ENV || 'development'}] mode`);

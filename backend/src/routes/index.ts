@@ -8,6 +8,7 @@ import interviewRoutes from '../features/interviews/interviewRoutes';
 import adminRoutes from '../features/admin/adminRoutes';
 import placementRoutes from '../features/placement/placementRoutes';
 import notificationRoutes from '../features/notifications/notificationRoutes';
+import aiRoutes from '../features/ai/aiRoutes';
 import { getIsRedisConnected } from '../config/redis';
 
 const router = Router();
@@ -20,6 +21,7 @@ router.use('/interviews', interviewRoutes);
 router.use('/placement', placementRoutes);
 router.use('/admin', adminRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/ai', aiRoutes);
 
 // Liveness check endpoint (process responsiveness)
 router.get('/health', (_req, res) => {

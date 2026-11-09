@@ -131,8 +131,24 @@ app.add_middleware(
     allow_origins=list(set(settings.ALLOWED_ORIGINS + ["http://localhost:5173"])),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "Accept"],
+    allow_headers=["Content-Type", "Authorization", "Accept", "X-Correlation-ID", "X-Request-ID"],
+    expose_headers=["X-Correlation-ID"],
 )
+
+@app.middleware("http")
+async def correlation_and_logging_middleware(request, call_next):
+    corr_id = request.headers.get("x-correlation-id") or request.headers.get("x-request-id")
+    if not corr_id:
+        import uuid
+        corr_id = str(uuid.uuid4())
+    import time
+    start_time = time.time()
+    response = await call_next(request)
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+    response.headers["X-Correlation-ID"] = corr_id
+    if request.url.path not in ["/health", "/"]:
+        logger.info(f"[{corr_id}] {request.method} {request.url.path} {response.status_code} ({duration_ms}ms)")
+    return response
 
 models_loaded = MODULE_STATUS["analyzer"] and MODULE_STATUS["parser"]
 

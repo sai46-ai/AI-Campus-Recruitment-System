@@ -10,11 +10,15 @@ import apiRouter from './routes';
 import { errorHandler } from './shared/middleware/errorHandler';
 import { apiRateLimiter } from './shared/middleware/rateLimiter';
 import { csrfProtection } from './shared/middleware/csrfMiddleware';
+import { correlationMiddleware } from './shared/middleware/correlationMiddleware';
 
 const app: Application = express();
 
 // Trust reverse proxy (1 hop from Nginx reverse proxy to Express container)
 app.set('trust proxy', 1);
+
+// Request Correlation ID Middleware (attaches req.id and X-Correlation-ID response header)
+app.use(correlationMiddleware);
 
 // Security Middlewares
 app.use(helmet({
@@ -25,7 +29,7 @@ app.use(helmet({
 // is not in the allowlist is REJECTED. There is no silent fallback.
 const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
-  .map((o) => o.trim())
+  .map((o) => o.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 
 const devFallbacks = process.env.NODE_ENV !== 'production'
@@ -47,14 +51,23 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token', 'X-Correlation-ID', 'X-Request-ID'],
+  exposedHeaders: ['X-Correlation-ID'],
 }));
 
 // Express Parsing Middlewares
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(cookieParser());
-app.use(morgan('dev'));
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(
+    morgan((tokens, req, res) => {
+      const id = (req as any).id ? `[${(req as any).id}] ` : '';
+      return `${id}${tokens.method(req, res)} ${tokens.url(req, res)} ${tokens.status(req, res)} ${tokens['response-time'](req, res)} ms - ${tokens.res(req, res, 'content-length')}`;
+    })
+  );
+}
 
 // Resumes are NOT served as a public static directory. The physical file path is
 // only readable through the authenticated GET /resumes/:id/download endpoint,
@@ -72,6 +85,7 @@ app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
     message: `Cannot find route ${req.originalUrl} on this server.`,
+    correlationId: req.id,
   });
 });
 
