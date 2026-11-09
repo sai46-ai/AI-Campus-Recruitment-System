@@ -52,7 +52,12 @@ export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <div className="precision-editorial min-h-screen flex flex-col bg-transparent text-[#344942] selection:bg-[#0A7D6E] selection:text-white relative">
             {/* Centralized 5-Environment 3D WebGL Background */}
             <AtmosphericBackground />

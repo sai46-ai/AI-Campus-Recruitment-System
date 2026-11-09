@@ -61,18 +61,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initAuth = async () => {
       try {
-        // Bootstrap CSRF token
+        // Bootstrap pre-auth CSRF token for forms
         await fetchFreshCsrfToken().catch(() => {});
 
-        // Attempt in-memory refresh from HttpOnly cookie
-        const token = await executeCoordinatedRefresh();
-        if (isMounted && token) {
-          setAccessToken(token);
-          setBrokerToken(token);
-          const meRes = await api.get('/auth/me');
-          if (isMounted && meRes.data?.data) {
-            setUser(meRes.data.data);
-            safeSetStorage('user', JSON.stringify(meRes.data.data));
+        // Only attempt refresh if a prior session indicator exists in local cache
+        const hasCachedSession = !!safeGetStorage('user');
+        if (hasCachedSession) {
+          const token = await executeCoordinatedRefresh();
+          if (isMounted && token) {
+            setAccessToken(token);
+            setBrokerToken(token);
+            const meRes = await api.get('/auth/me');
+            if (isMounted && meRes.data?.data) {
+              setUser(meRes.data.data);
+              safeSetStorage('user', JSON.stringify(meRes.data.data));
+            }
           }
         }
       } catch {

@@ -9,7 +9,7 @@ import {
 } from './tokenBroker';
 import clientLogger from '../utils/clientLogger';
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:5000/api/v1');
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '') || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:5000/api/v1');
 
 export const api = axios.create({
   baseURL: API,
@@ -17,7 +17,7 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -31,10 +31,15 @@ api.interceptors.request.use((config) => {
     config.headers['X-Correlation-ID'] = correlationId;
   }
 
-  // Attach X-CSRF-Token for state-changing requests
+  // Attach X-CSRF-Token for state-changing requests, proactively bootstrapping if absent
   const method = config.method?.toUpperCase();
   if (method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
-    const csrfToken = getCsrfToken();
+    let csrfToken = getCsrfToken();
+    if (!csrfToken) {
+      try {
+        csrfToken = await fetchFreshCsrfToken();
+      } catch {}
+    }
     if (csrfToken) {
       config.headers['X-CSRF-Token'] = csrfToken;
     }
@@ -54,8 +59,17 @@ api.interceptors.response.use(
       err.correlationId = correlationId;
     }
 
-    // 1. Handle 401 Unauthorized via coordinated in-memory refresh
-    if (err.response?.status === 401 && !req._retry) {
+    const url = req.url || '';
+    const isAuthEndpoint =
+      url.includes('/auth/login') ||
+      url.includes('/auth/register') ||
+      url.includes('/auth/refresh-token') ||
+      url.includes('/auth/logout') ||
+      url.includes('/auth/csrf-token') ||
+      url.includes('/auth/verify-otp');
+
+    // 1. Handle 401 Unauthorized via coordinated in-memory refresh on protected endpoints only
+    if (err.response?.status === 401 && !req._retry && !isAuthEndpoint) {
       req._retry = true;
       try {
         const freshAccessToken = await executeCoordinatedRefresh();
@@ -66,17 +80,20 @@ api.interceptors.response.use(
         }
         return api(req);
       } catch (refErr: any) {
+        const hadSession = !!getAccessToken() || !!localStorage.getItem('user');
         clearTokens();
         try {
           localStorage.removeItem('user');
         } catch {}
         if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          if (hadSession) {
+            clientLogger.warn('Authentication session expired, redirecting to login');
+          }
           window.location.href = '/login';
         }
         if (refErr?.response?.data) {
           refErr.response.data.message = 'Your session has expired. Please sign in again.';
         }
-        clientLogger.warn('Authentication session expired, redirecting to login');
         return Promise.reject(refErr);
       }
     }
