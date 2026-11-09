@@ -2,31 +2,14 @@
 # AI CAMPUS RECRUITMENT SYSTEM — RENDER INFRASTRUCTURE BLUEPRINT (render.yaml)
 # ==============================================================================
 # Architecture:
-#   1. ai-campus-frontend: Render Static Site (React 18 + Vite + Three.js)
-#   2. ai-campus-backend: Render Web Service (Node.js 20 + Express v2 + MongoDB)
-#   3. ai-campus-ai-service: Render Private Service (Python 3.10 + FastAPI + Pure Python NLP)
+#   - Frontend: Hosted on Vercel (Edge CDN + SPA + Proxy)
+#   - Backend: Render Web Service (Node.js 20 + Express v2 + MongoDB Atlas)
+#   - AI Service: Render Private Service (Python 3.10 + FastAPI + NLP)
 # ==============================================================================
 
 services:
   # ----------------------------------------------------------------------------
-  # 1. FRONTEND STATIC SITE
-  # ----------------------------------------------------------------------------
-  - type: web
-    name: ai-campus-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        value: https://ai-campus-backend.onrender.com/api/v1
-
-  # ----------------------------------------------------------------------------
-  # 2. BACKEND API WEB SERVICE
+  # 1. BACKEND API WEB SERVICE
   # ----------------------------------------------------------------------------
   - type: web
     name: ai-campus-backend
@@ -46,7 +29,9 @@ services:
       - key: PORT
         value: 10000
       - key: CLIENT_URL
-        value: https://ai-campus-frontend.onrender.com
+        value: https://ai-campus-recruitment.vercel.app
+      - key: ALLOW_VERCEL_PREVIEWS
+        value: "true"
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
@@ -70,7 +55,7 @@ services:
         sync: false
 
   # ----------------------------------------------------------------------------
-  # 3. AI MICROSERVICE (PRIVATE SERVICE)
+  # 2. AI MICROSERVICE (PRIVATE SERVICE)
   # ----------------------------------------------------------------------------
   - type: pserv
     name: ai-campus-ai-service

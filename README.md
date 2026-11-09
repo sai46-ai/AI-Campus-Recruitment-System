@@ -210,7 +210,7 @@ The system requires zero manual configuration out of the box.
 | **Backend** | `npm --prefix backend run build` | Compiles TypeScript source to `/backend/dist`. |
 | **Backend** | `npm --prefix backend start` | Starts compiled production server (`node dist/server.js`). |
 | **Backend** | `npm --prefix backend run dev` | Runs development server with hot-reload (`ts-node-dev`). |
-| **Backend** | `npm --prefix backend test` | Executes Jest test suites (152 tests across 13 suites). |
+| **Backend** | `npm --prefix backend test` | Executes Jest test suites (154 tests across 13 suites). |
 | **Frontend** | `npm --prefix frontend run dev` | Runs Vite development server on port 5173. |
 | **Frontend** | `npm --prefix frontend run build` | Compiles TypeScript and builds production distribution in `/frontend/dist`. |
 | **Frontend** | `npm --prefix frontend run preview` | Previews production build locally. |
@@ -271,17 +271,17 @@ VITE_ENV=development
 ## 11. DEPLOYMENT PREPARATION
 
 The repository is configured for immediate cloud and container deployment:
-1. **Render Cloud Platform (Recommended):** Deploy via Blueprint using [`render.yaml`](render.yaml) orchestrating:
-   - Frontend: Render Static Site (`ai-campus-frontend`)
-   - Backend: Render Web Service (`ai-campus-backend`, Starter plan with 1 GB Persistent Disk mounted at `/var/data`)
-   - AI Microservice: Render Private Service (`ai-campus-ai-service`)
-   - Step-by-step walkthrough provided in [`ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/08_DEPLOYMENT_RUNBOOK_AND_ROLLBACK.md`](ProjectUpgradeReports/RENDER-PRODUCTION-READINESS/08_DEPLOYMENT_RUNBOOK_AND_ROLLBACK.md).
+1. **Hybrid Vercel + Render Deployment (Recommended Production Architecture):**
+   - **Frontend (Vercel):** Deployed to Vercel via [`vercel.json`](vercel.json) or [`frontend/vercel.json`](frontend/vercel.json) as a fast global Edge CDN SPA. Includes automatic proxy rewrites (`/api/* -> https://ai-campus-backend.onrender.com/api/*`) and SPA fallback.
+   - **Backend API (Render):** Render Web Service (`ai-campus-backend`, Starter plan with 1 GB Persistent Disk mounted at `/var/data` for uploads, or free-tier with dynamic PDF generation fallback). Configured via [`render.yaml`](render.yaml).
+   - **AI Microservice (Render):** Render Private Service (`ai-campus-ai-service`, Python 3.10 + FastAPI) communicating via internal VPC networking.
+   - Full walkthrough provided in [`ProjectUpgradeReports/DEPLOYMENT/AUDIT_AND_DEPLOYMENT_READINESS.md`](ProjectUpgradeReports/DEPLOYMENT/AUDIT_AND_DEPLOYMENT_READINESS.md).
 2. **Docker Compose:** Run `cp .env.example .env && docker compose up -d --build`. Persists data to named Docker volumes.
 
 ---
 
 ## 12. KNOWN LIMITATIONS & RETIRED TOOLING
 
-- **Automated Test Coverage:** The test suite relies on 152 comprehensive Jest integration tests (`supertest`) across 13 suites, Python unit tests (7 tests), and Vite production compilation checks.
+- **Automated Test Coverage:** The test suite relies on 154 comprehensive Jest integration tests (`supertest`) across 13 suites, Python unit tests (7 tests), and Vite production compilation checks.
 - **Email Delivery:** Production registrations require either configured SMTP credentials (`SMTP_HOST`, `SMTP_USER`, etc.) or the portfolio demonstration flag `ALLOW_DEV_OTP=true` (which logs verification OTPs to the server console).
 - **Google OAuth:** Backend endpoint `/api/v1/auth/google` is implemented and verified, but the web UI currently uses email/password authentication.

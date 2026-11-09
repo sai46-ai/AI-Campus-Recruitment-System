@@ -38,13 +38,27 @@ const devFallbacks = process.env.NODE_ENV !== 'production'
 
 const allowedOrigins = [...new Set([...configuredOrigins, ...devFallbacks])];
 
+const isAllowedOrigin = (origin: string): boolean => {
+  if (allowedOrigins.includes(origin)) return true;
+  for (const configured of configuredOrigins) {
+    if (configured.includes('*')) {
+      const regex = new RegExp('^' + configured.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$');
+      if (regex.test(origin)) return true;
+    }
+  }
+  if (process.env.ALLOW_VERCEL_PREVIEWS === 'true' && /^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin)) {
+    return true;
+  }
+  return false;
+};
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) {
       // No Origin header (same-origin, server-to-server, curl) -> allow.
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       return callback(null, true);
     }
     return callback(new Error(`CORS: origin ${origin} is not allowed`));

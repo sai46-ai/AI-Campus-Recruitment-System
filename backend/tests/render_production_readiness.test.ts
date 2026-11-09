@@ -101,5 +101,26 @@ describe('Render Production Readiness Verification Suite', () => {
       expect(normalized).toBe('');
     });
   });
+
+  describe('Vercel and Cross-Origin Deployment CORS Allowlist', () => {
+    it('allows Vercel preview domains when ALLOW_VERCEL_PREVIEWS is enabled', async () => {
+      process.env.ALLOW_VERCEL_PREVIEWS = 'true';
+      const res = await request(app)
+        .get('/api/v1/health')
+        .set('Origin', 'https://ai-campus-recruitment-git-feature.vercel.app');
+
+      expect(res.status).toBe(200);
+      expect(res.headers['access-control-allow-origin']).toBe('https://ai-campus-recruitment-git-feature.vercel.app');
+      delete process.env.ALLOW_VERCEL_PREVIEWS;
+    });
+
+    it('rejects unauthorized origins', async () => {
+      const res = await request(app)
+        .get('/api/v1/health')
+        .set('Origin', 'https://malicious-site.example.com');
+
+      expect(res.status).toBe(500);
+    });
+  });
 });
 
