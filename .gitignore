@@ -63,3 +63,7 @@ backend/logs/
 **/.playwright-mcp/
 security-audit/
 scratch/
+
+# Upgrade & audit reports
+ProjectUpgradeReports/
+**/ProjectUpgradeReports/
